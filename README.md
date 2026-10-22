@@ -140,7 +140,7 @@ permissions:
   security-events: write
 steps:
   - uses: actions/checkout@v4
-  - uses: Krrishkumar125/secret-blast-radius@v0.4.0
+  - uses: Krrishkumar125/secret-blast-radius@v0.4.1
     with:
       fail-on: critical
   - uses: github/codeql-action/upload-sarif@v3

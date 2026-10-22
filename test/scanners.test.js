@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { generateKeyPairSync } from 'node:crypto';
 import { scan, runbook, failsAt, formatText, formatMarkdown } from '../src/index.js';
-import { isReference, looksLikeSecretName, tokenKind } from '../src/util.js';
+import { isReference, looksLikeSecretName, tokenKind, isSecretPair } from '../src/util.js';
 import { sshKeyEncrypted, parseDotenv } from '../src/scanners.js';
 import { fixture, FAKE } from './helpers.js';
 
@@ -233,4 +233,16 @@ test('dotenv: hyphenated prose values are treated as examples (seen in vercel/ne
   t.after(f.cleanup);
   const r = run(f.root, ['dotenv']);
   assert.deepEqual(r.findings[0].names, ['REAL_SECRET']);
+});
+
+test('isSecretPair: passphrase-shaped credentials under strong secret names are kept', () => {
+  assert.equal(isSecretPair('DATABASE_PASSWORD', 'correct-horse-battery-staple'), true);
+  assert.equal(isSecretPair('API_TOKEN', 'purple monkey dishwasher 42'), true);
+  assert.equal(isSecretPair('DB_PASSWORD', 'Tangerine.Velvet.Orbit'), true);
+  // example prose still ignored
+  assert.equal(isSecretPair('LOCAL_SECRET', 'local-secret'), false);
+  assert.equal(isSecretPair('TOKEN_SECRET', 'this-is-a-secret-value-with-at-least-32-characters'), false);
+  assert.equal(isSecretPair('JWT_SECRET', 'super-secret-dev-key'), false);
+  assert.equal(isSecretPair('SESSION_SECRET', 'keyboard cat'), false);
+  assert.equal(isSecretPair('API_KEY', 'test-api-key-123'), false);
 });

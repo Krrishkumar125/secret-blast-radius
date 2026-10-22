@@ -77,6 +77,7 @@ export function looksLikeSecretName(name) {
   return SECRET_NAME.test(name) && !NOT_SECRET_NAME.test(name);
 }
 
+const EXAMPLE_WORD = /^(secret|secrets|password|passwd|pass|token|key|apikey|api|jwt|session|cookie|signing|local|localhost|dev|development|test|testing|tests|example|examples|sample|demo|dummy|fake|mock|placeholder|change|changeme|replace|me|xxx|todo|redacted|default|insecure|value|your|here|this|not|real|keyboard|cat|foo|bar|baz|my|super|unsafe|temp|tmp|ci)$/i;
 const URL_NAME = /(_url|_uri|_dsn)$|^(dsn)$/i;
 
 /** Does this name/value pair hold a literal secret? URL-style names only count when they embed credentials. */
@@ -87,8 +88,11 @@ export function isSecretPair(name, value) {
   if (/^[a-z][a-z0-9+.-]*:\/\/[^/\s@]+@(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|host\.docker\.internal)([:/?]|$)/i.test(v)) return false;
   if (tokenKind(v)) return true;
   // Prose like "local-secret" or "this-is-a-secret-value-..." is a committed example, not a credential.
+  // Word shape alone is not enough: "correct-horse-battery-staple" is a real passphrase. Only discard
+  // all-word values that also contain a placeholder/example word.
   const words = v.replace(/[!.]+$/, '').split(/[-_ .]+/);
-  if (words.length >= 2 && words.every((w) => /^[a-z]+$|^[A-Z]+$|^\d+$/.test(w)) && words.some((w) => /^[a-z]{3,}$/i.test(w))) return false;
+  if (words.length >= 2 && words.every((w) => /^[a-z]+$|^[A-Z]+$|^\d+$/.test(w)) && words.some((w) => /^[a-z]{3,}$/i.test(w))
+    && words.some((w) => EXAMPLE_WORD.test(w))) return false;
   if (URL_NAME.test(name)) return /^[a-z][a-z0-9+.-]*:\/\/[^/\s:@]+:[^@\s]+@/i.test(v) || /[?&](password|token|key|secret)=[^&\s]+/i.test(v);
   return looksLikeSecretName(name) && v.length >= 8;
 }
