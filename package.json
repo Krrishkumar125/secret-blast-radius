@@ -14,7 +14,7 @@
   "files": ["bin", "src", "README.md", "LICENSE"],
   "engines": { "node": ">=18.18" },
   "scripts": {
-    "test": "node --test test/",
-    "check": "node --check bin/cli.js && node --test test/"
+    "test": "node --test test/scanners.test.js test/cli.test.js",
+    "check": "node --check bin/cli.js && npm test"
   }
 }
