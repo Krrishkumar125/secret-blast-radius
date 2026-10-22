@@ -34,3 +34,22 @@ jobs:
           npx secret-blast-radius --list-incidents
           npx secret-blast-radius --incident php2shell --sarif-file out.sarif --no-env .
           node -e "JSON.parse(require('fs').readFileSync('out.sarif','utf8'))"
+
+  action:
+    name: Composite action (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: sbr
+        uses: ./
+        with:
+          fail-on: none
+      - shell: bash
+        run: node -e "const s=JSON.parse(require('fs').readFileSync('${{ steps.sbr.outputs.sarif-file }}','utf8')); if(s.version!=='2.1.0') process.exit(1); console.log(s.runs[0].results.length+' results')"
