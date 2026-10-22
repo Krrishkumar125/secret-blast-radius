@@ -36,6 +36,10 @@ runs:
         SBR_SARIF: ${{ inputs.sarif-file }}
         SBR_VERSION: ${{ inputs.version }}
       run: |
-        args=(--only "$SBR_ONLY" --fail-on "$SBR_FAIL_ON" --sarif-file "$SBR_SARIF")
+        ws="$(pwd)"
+        case "$SBR_SARIF" in /*|[A-Za-z]:*) sarif="$SBR_SARIF" ;; *) sarif="$ws/$SBR_SARIF" ;; esac
+        args=(--only "$SBR_ONLY" --fail-on "$SBR_FAIL_ON" --sarif-file "$sarif")
         if [ -n "$SBR_INCIDENT" ]; then args+=(--incident "$SBR_INCIDENT"); fi
-        npx --yes "secret-blast-radius@${SBR_VERSION}" "${args[@]}" .
+        # Run from a neutral directory so npx never resolves a local package.json instead of the registry.
+        cd "${RUNNER_TEMP:-/tmp}"
+        npx --yes "secret-blast-radius@${SBR_VERSION}" "${args[@]}" "$ws"
