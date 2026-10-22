@@ -12,7 +12,7 @@ const cli = (args, env = {}) => spawnSync(process.execPath, [CLI, ...args], { en
 test('cli: text report, json, runbook file and exit codes', (t) => {
   const f = fixture({ 'home/.npmrc': `//registry.npmjs.org/:_authToken=${FAKE.npm}\n`, 'proj/.env': `STRIPE_SECRET_KEY=${FAKE.stripe}\n` });
   t.after(f.cleanup);
-  const base = ['--home', join(f.root, 'home'), '--no-env', join(f.root, 'proj')];
+  const base = ['--home', join(f.root, 'home'), '--no-env', '--no-exec', join(f.root, 'proj')];
 
   const txt = cli(base);
   assert.equal(txt.status, 0, txt.stderr);
