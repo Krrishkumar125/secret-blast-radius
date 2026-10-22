@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/Krrishkumar125/secret-blast-radius/actions/workflows/ci.yml/badge.svg)](https://github.com/Krrishkumar125/secret-blast-radius/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/secret-blast-radius)](https://www.npmjs.com/package/secret-blast-radius)
+[![downloads](https://img.shields.io/npm/dm/secret-blast-radius)](https://www.npmjs.com/package/secret-blast-radius)
 
 **One bad `npm install` can read every secret on your laptop. This tells you what it would get, whether it already happened, and what to rotate first.**
 
@@ -140,7 +141,7 @@ permissions:
   security-events: write
 steps:
   - uses: actions/checkout@v4
-  - uses: Krrishkumar125/secret-blast-radius@v0.4.1
+  - uses: Krrishkumar125/secret-blast-radius@v0
     with:
       fail-on: critical
   - uses: github/codeql-action/upload-sarif@v3
@@ -151,6 +152,20 @@ steps:
 
 Or without the action: `npx secret-blast-radius@0 --only malicious,repo,php,env --fail-on critical --sarif-file sbr.sarif`.
 SARIF only gets file locations for findings inside the repo. Home-directory findings are reported without a path.
+
+## As a pre-commit hook
+
+With [pre-commit](https://pre-commit.com), add this to `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/Krrishkumar125/secret-blast-radius
+    rev: v0
+    hooks:
+      - id: secret-blast-radius
+```
+
+It checks the repo only (worm IOCs, committed `.env` secrets, unsafe workflows) and blocks the commit on high or critical findings.
 
 ## Safety
 

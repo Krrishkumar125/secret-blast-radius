@@ -1,0 +1,7 @@
+- id: secret-blast-radius
+  name: secret-blast-radius
+  description: Fail the commit if the repo has worm IOCs, committed .env secrets or unsafe workflows. Read-only; never prints secret values.
+  entry: secret-blast-radius --only repo,dotenv,malicious --no-env --no-color --fail-on high
+  language: node
+  pass_filenames: false
+  always_run: true
