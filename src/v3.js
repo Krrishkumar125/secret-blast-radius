@@ -5,6 +5,7 @@ import { readFileSync, realpathSync } from 'node:fs';
 const real = (p) => { try { return realpathSync.native(p); } catch { return p; } };
 import { readText, listDir, exists, walk, isReference, fingerprint } from './util.js';
 import { parseLockfile } from './supply.js';
+import { isPyLock, parsePyLock } from './v4.js';
 
 const EXT_IOCS = JSON.parse(readFileSync(new URL('./extension-iocs.json', import.meta.url), 'utf8'));
 const tilde = (ctx, p) => (p.startsWith(ctx.home) ? '~' + p.slice(ctx.home.length).replace(/\\/g, '/') : p);
@@ -200,14 +201,16 @@ export function scanHistory(ctx) {
 }
 
 /* ---------- 5. Opt-in OSV lookup for MAL- advisories (network) ---------- */
-const OSV_ECOSYSTEM = { npm: 'npm' };
+const OSV_ECOSYSTEM = { npm: 'npm', PyPI: 'PyPI' };
 export function collectPackages(ctx) {
   const pkgs = new Map();
   for (const root of ctx.projects) {
     for (const f of walk(root, { maxDepth: ctx.depth, skip: SKIP })) {
-      if (!LOCKFILES.has(basename(f))) continue;
+      const py = isPyLock(f);
+      if (!LOCKFILES.has(basename(f)) && !py) continue;
       const t = readText(f);
       if (!t) continue;
+      if (py) { for (const { name, version } of parsePyLock(f, t)) if (version && /^\d/.test(version)) pkgs.set(`PyPI:${name}@${version}`, { name, version, ecosystem: 'PyPI', file: tilde(ctx, f) }); continue; }
       for (const { name, version } of parseLockfile(f, t)) if (name && /^\d/.test(version)) pkgs.set(`${name}@${version}`, { name, version, ecosystem: 'npm', file: tilde(ctx, f) });
     }
   }

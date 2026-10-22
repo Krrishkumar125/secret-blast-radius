@@ -8,7 +8,7 @@ export function formatText(result, { color = false } = {}) {
   const sev = { critical: (s) => c('1;31', s), high: (s) => c('31', s), medium: (s) => c('33', s), low: (s) => c('2', s) };
   const lines = [];
   const { counts } = result;
-  lines.push(c('1', 'secret-blast-radius') + ' — what a malicious install script could steal from this machine right now');
+  lines.push(c('1', 'secret-blast-radius') + (result.harden ? ' --harden: settings that would have blunted this month\'s attacks' : ' — what a malicious install script could steal from this machine right now'));
   lines.push('');
   if (result.incident) {
     const inc = INCIDENTS[result.incident];
@@ -18,13 +18,14 @@ export function formatText(result, { color = false } = {}) {
   }
   if (result.osvQueried != null) lines.push(c('2', `OSV: checked ${result.osvQueried} package versions against MAL- advisories (online, opt-in).`), '');
   if (!result.findings.length) {
-    lines.push(result.incident ? 'Nothing relevant found by these checks.' : 'No reachable secrets found in the places checked. Nice.');
+    lines.push(result.harden ? 'All checked preventive settings are in place.' : result.incident ? 'Nothing relevant found by these checks.' : 'No reachable secrets found in the places checked. Nice.');
     return lines.join('\n');
   }
   for (const f of result.findings) {
     lines.push(`${sev[f.severity](`${ICON[f.severity]} ${f.severity.toUpperCase().padEnd(8)}`)} ${f.title}`);
     lines.push(`  ${c('2', f.location + (f.fingerprint ? `  ${f.fingerprint}` : '') + (f.ageDays != null ? `  (${f.ageDays}d old)` : ''))}`);
     lines.push(`  ${f.detail}`);
+    if (f.fix) lines.push(`  ${c('32', 'fix:')} ${f.fix}`);
     lines.push('');
   }
   lines.push(`Summary: ${counts.critical} critical, ${counts.high} high, ${counts.medium} medium, ${counts.low} low.`);

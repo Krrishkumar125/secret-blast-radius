@@ -34,6 +34,8 @@ Rotation order if this machine is ever compromised: 1. persistence  2. npm  3. a
 
 *(Illustrative output: fingerprints and paths are examples.)*
 
+**New in 0.4:** `--harden` audits the settings that would have blunted this month's attacks and prints the exact fix: cooldowns, `--require-hashes`, uv `exclude-newer`, digest-pinned images, OIDC instead of long-lived publish/cloud keys, unpinned MCP servers, `.env` files with secrets committed to git. Also new: Python lockfiles and virtualenvs (requirements, poetry.lock, uv.lock, Pipfile.lock, pylock.toml), Docker image references, and `--incident litellm` / `--incident zeabur`.
+
 **New in 0.3:** `--history` shows the dates a bad version sat in your lockfile; GlassWorm editor-extension check; npm cache check; RubyGems/Cargo/Composer/Terraform/Pulumi credential files; opt-in `--osv` malicious-package lookup; a rotation plan with verify steps and provider docs.
 
 ## Why this exists
@@ -75,6 +77,8 @@ Every advisory ends the same way: *"rotate everything the machine could access."
 | `extensions` | Installed VS Code / Cursor / Windsurf / VSCodium / Kiro / remote-server extensions against 149 GlassWorm IOCs from Socket (malicious, version-scoped, and flagged sleepers), including ones pulled in through `extensionPack` |
 | `npm-cache` | Tarballs of known-bad versions in the npm cache index: proof the machine downloaded one even if no lockfile shows it today |
 | `history` (`--history`) | **Exposure window.** Walks each lockfile's git history and reports when a known-bad version entered and left (`2026-10-08 → 2026-10-10`), so you know which CI runs and machines to treat as exposed. `--since 2026-09-01` narrows it |
+| `python` | Known-bad PyPI versions (litellm 1.107.0, 1.82.7/1.82.8) in requirements*.txt, poetry.lock, uv.lock, Pipfile.lock, pdm.lock, pylock.toml and project virtualenvs; the litellm `cook.pth` startup hook |
+| `images` | Dockerfile `FROM` and compose `image:` references to compromised image digests/tags, and floating tags (`latest`, `main-stable`) that pointed at a compromised image during a known window |
 | `persistence` | `gh-token-monitor` (systemd unit, LaunchAgent, Windows dir, script) |
 | `host-persistence` | Crontab lines that pipe a server into `bash` (GhostAction `#ghc2`), the `manifest-cache.js --warm` process and `/tmp/tmp.ts018051808.lock` (@subql) |
 | `repo` | Workflows that contact GhostAction infrastructure, dump `git log -p --all`, or serialise `toJSON(secrets)` to the network; `.vscode/tasks.json` that auto-runs a "font"/image; Claude Code hooks that run disguised files; the tensorlake worm branch |
@@ -91,6 +95,27 @@ Every advisory ends the same way: *"rotate everything the machine could access."
 **Opt-in online check:** `--osv` sends the package names and versions from your lockfiles (nothing else) to the [OSV API](https://google.github.io/osv.dev/post-v1-querybatch/) and reports `MAL-` advisories from the [OpenSSF malicious-packages](https://github.com/ossf/malicious-packages) feed. That covers far more than the bundled list. Vulnerability (CVE/GHSA) results are ignored on purpose; use OSV-Scanner for those.
 
 **Small extras:** least-privilege hints from a token's public prefix (classic `ghp_` PAT, long-lived `AKIA` key), and MCP servers started with an unpinned `npx -y <pkg>`.
+
+## `--harden`: prevent the next one
+
+```bash
+npx secret-blast-radius --harden
+```
+
+Read-only audit of preventive settings. Every finding has a `fix:` line with the exact change:
+
+| Check | Why (Oct 2026 evidence) | Fix it prints |
+|---|---|---|
+| npm `ignore-scripts`, cooldown for npm/pnpm/Yarn/Bun | tensorlake ran from `preinstall` and was live under 2h | `ignore-scripts=true`, `min-release-age=3`, `minimumReleaseAge: 4320`, … |
+| pnpm `dangerouslyAllowAllBuilds: true` | pnpm blocks dependency builds by default; this turns that off | remove it, allow-list with `allowBuilds`/`onlyBuiltDependencies` |
+| requirements not pinned / no `--hash` | an unpinned `litellm` resolved to 1.107.0 | `uv pip compile --generate-hashes`, `pip install --require-hashes` |
+| uv without `exclude-newer` | litellm 1.107.0 was live ~2h | `exclude-newer = "3 days"` under `[tool.uv]` |
+| images not pinned by digest | litellm's `latest`/`main-stable` served a stealer for ~2.5h | `image:tag@sha256:…` + Renovate/Dependabot |
+| long-lived `NPM_TOKEN`, PyPI `password:`, AWS keys in workflows | stolen long-lived tokens drove LiteLLM, tensorlake, GhostAction | npm/PyPI trusted publishing, AWS `role-to-assume` (OIDC) |
+| MCP servers run with `npx -y <pkg>` | pulls whatever is latest on every start | pin `pkg@x.y.z` |
+| `.env` with secret-looking values committed or not ignored (needs git) | CERT-In Oct 15: agents got in via plaintext credentials in repos | `git rm --cached`, `.gitignore`, rotate |
+
+Checks only fire on files you have. Settings that are already safe by default (pnpm build blocking) are not nagged about. Cargo cooldowns land in Rust 1.100 (Nov 12), so they aren't checked yet.
 
 ## Rotation plan
 
@@ -115,7 +140,7 @@ permissions:
   security-events: write
 steps:
   - uses: actions/checkout@v4
-  - uses: Krrishkumar125/secret-blast-radius@v0.3.0
+  - uses: Krrishkumar125/secret-blast-radius@v0.4.0
     with:
       fail-on: critical
   - uses: github/codeql-action/upload-sarif@v3

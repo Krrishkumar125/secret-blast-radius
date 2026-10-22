@@ -5,8 +5,9 @@ import { SCANNERS } from './scanners.js';
 import { SUPPLY_SCANNERS, loadIocs } from './supply.js';
 import { INCIDENTS } from './incidents.js';
 import { V3_SCANNERS, osvMalicious } from './v3.js';
+import { V4_SCANNERS } from './v4.js';
 
-export const ALL_SCANNERS = { ...SCANNERS, ...SUPPLY_SCANNERS, ...V3_SCANNERS };
+export const ALL_SCANNERS = { ...SCANNERS, ...SUPPLY_SCANNERS, ...V3_SCANNERS, ...V4_SCANNERS };
 
 function defaultExec(cmd, args) {
   try {
@@ -132,8 +133,10 @@ export function scan(options = {}) {
     exec: options.exec === false ? null : options.exec ?? defaultExec,
     checkTmp: options.checkTmp ?? options.home === undefined,
     history: options.history ?? null, // {since?: string}
+    harden: !!options.harden || !!options.only?.includes('harden'),
   };
   let onlyList = options.only;
+  if (options.harden) onlyList = ['hardening', 'harden', 'ai'];
   if (options.incident) {
     const inc = INCIDENTS[options.incident];
     if (!inc) throw new Error(`Unknown incident "${options.incident}". Use one of: ${Object.keys(INCIDENTS).join(', ')}`);
@@ -147,7 +150,7 @@ export function scan(options = {}) {
     if ((only && !only.has(name)) || skip.has(name)) continue;
     findings.push(...fn(ctx));
   }
-  return finish(ctx, options, findings);
+  return finish(ctx, options, options.harden ? findings.filter((f) => f.category === 'hardening' || f.id === 'ai.mcp-unpinned') : findings);
 }
 
 /** Same as scan(), plus the opt-in OSV lookup (network) when options.osv is set. */
@@ -156,7 +159,7 @@ export async function scanAsync(options = {}) {
   if (!options.osv) return result;
   const ctx = { home: result.home, projects: result.projects, depth: options.depth ?? 4, iocs: { updated: result.iocsUpdated } };
   const { findings: osv, queried } = await osvMalicious(ctx, options.osvOptions);
-  const known = new Set(result.findings.filter((f) => f.id === 'supply.malicious-version').map((f) => f.title.split(' ')[2] + '|' + f.location));
+  const known = new Set(result.findings.filter((f) => f.id === 'supply.malicious-version').map((f) => f.title.split(' ')[2].replace('==', '@') + '|' + f.location));
   const findings = osv.filter((f) => !known.has(f.title.split(' ')[2] + '|' + f.location));
   return { ...finish(ctx, options, [...result.findings, ...findings]), osvQueried: queried };
 }
@@ -164,7 +167,7 @@ export async function scanAsync(options = {}) {
 function finish(ctx, options, findings) {
   findings.sort((a, b) => SEVERITY.indexOf(a.severity) - SEVERITY.indexOf(b.severity) || (ROTATION[a.category]?.order ?? 99) - (ROTATION[b.category]?.order ?? 99));
   const counts = Object.fromEntries(SEVERITY.map((s) => [s, findings.filter((f) => f.severity === s).length]));
-  return { scannedAt: new Date().toISOString(), home: ctx.home, projects: ctx.projects, iocsUpdated: ctx.iocs?.updated ?? options.iocsUpdated, incident: options.incident, counts, findings };
+  return { scannedAt: new Date().toISOString(), home: ctx.home, projects: ctx.projects, iocsUpdated: ctx.iocs?.updated ?? options.iocsUpdated, incident: options.incident, harden: !!options.harden, counts, findings };
 }
 
 export function runbook(result) {

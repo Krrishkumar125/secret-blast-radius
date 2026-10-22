@@ -64,6 +64,7 @@ export function isReference(value) {
   if (/^(your|enter|insert|replace|add)[-_ ]?(your[-_ ]?)?[a-z_ -]*(here)?$/i.test(v) || /_here$/i.test(v)) return true;
   if (/^\$\{\{.*\}\}$/.test(v)) return true; // ${{ secrets.X }} (GitHub Actions)
   if (/^(x{4,}|\*{4,}|your[-_ ].*|changeme|placeholder|todo|redacted)$/i.test(v)) return true;
+  if (/^(fake|dummy|mock)[-_]/i.test(v) || /:\/\/[^:@\s]*:(fake|dummy|mock)[-_][^@]*@/i.test(v)) return true;
   if (/not[-_ ]?a[-_ ]?(real[-_ ]?)?secret|^change[-_ ]?me|^dummy|^placeholder|^replace[-_ ]?(me|this)|^example|^sample/i.test(v)) return true;
   return false;
 }
@@ -82,6 +83,8 @@ const URL_NAME = /(_url|_uri|_dsn)$|^(dsn)$/i;
 export function isSecretPair(name, value) {
   if (value == null || isReference(value)) return false;
   const v = String(value);
+  // Credentials for a database on this machine (docker-compose dev defaults) are not reachable secrets.
+  if (/^[a-z][a-z0-9+.-]*:\/\/[^/\s@]+@(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|host\.docker\.internal)([:/?]|$)/i.test(v)) return false;
   if (tokenKind(v)) return true;
   // Prose like "local-secret" or "this-is-a-secret-value-..." is a committed example, not a credential.
   const words = v.replace(/[!.]+$/, '').split(/[-_ .]+/);

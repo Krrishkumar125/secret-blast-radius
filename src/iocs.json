@@ -218,6 +218,29 @@
    "incident": "shai-hulud",
    "safe": "the release before the listed version (see advisory)",
    "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "PyPI",
+   "name": "litellm",
+   "versions": [
+    "1.107.0"
+   ],
+   "campaign": "litellm release compromise (Oct 21, 2026)",
+   "incident": "litellm",
+   "safe": "1.106.2",
+   "ref": "https://docs.litellm.ai/blog/security-incident-oct-21-2026"
+  },
+  {
+   "ecosystem": "PyPI",
+   "name": "litellm",
+   "versions": [
+    "1.82.7",
+    "1.82.8"
+   ],
+   "campaign": "litellm compromise (Mar 2026)",
+   "incident": "litellm",
+   "safe": "1.106.2",
+   "ref": "https://osv.dev/vulnerability/MAL-2026-2144"
   }
  ],
  "markers": {
@@ -228,10 +251,13 @@
    "iseekaigogo.com",
    "ci-artifacts.dev",
    "npm-cache.com",
-   "my-github.com"
+   "my-github.com",
+   "www.litellm.dev"
   ],
   "files": [
-   "/tmp/tmp.ts018051808.lock"
+   "/tmp/tmp.ts018051808.lock",
+   "/tmp/remote_code_loader.lock",
+   "/tmp/.pc_once_72129118c59f5636c0bb"
   ],
   "cron": [
    "#ghc2",
@@ -247,5 +273,37 @@
   "optionalDependencies": [
    "@opensearch/setup"
   ]
- }
+ },
+ "images": [
+  {
+   "incident": "litellm",
+   "repos": [
+    "ghcr.io/berriai/litellm",
+    "ghcr.io/berriai/litellm-database",
+    "ghcr.io/berriai/litellm-non_root",
+    "docker.io/litellm/litellm",
+    "litellm/litellm"
+   ],
+   "badTags": [
+    "v1.107.0"
+   ],
+   "floatingTags": [
+    "latest",
+    "main-latest",
+    "main-stable"
+   ],
+   "digests": [
+    "sha256:1bbcb1443bc962e45f5aad53fe3d2c30600e0379715fb6c664cdd3ac126c339e",
+    "sha256:bd1aeee419ea36da9aa2b657288da4101887be468f020ac63d22ba6ed84a3ea5",
+    "sha256:56b74573eed6e4aafe4b50603dbe7853e0345f188c8e44a09f1098caf1f4bcdf"
+   ],
+   "digestPrefixes": [
+    "sha256:c00f9d92c427",
+    "sha256:7b00e91cd2fe"
+   ],
+   "window": "2026-10-21 11:46\u201314:20 UTC",
+   "safe": "v1.106.2 pinned by digest",
+   "ref": "https://docs.litellm.ai/blog/security-incident-oct-21-2026"
+  }
+ ]
 }

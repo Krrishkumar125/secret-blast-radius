@@ -9,11 +9,12 @@ const rel = (root, p) => relative(root, p).replace(/\\/g, '/') || basename(p);
 const tilde = (ctx, p) => (p.startsWith(ctx.home) ? '~' + p.slice(ctx.home.length).replace(/\\/g, '/') : p);
 
 export function loadIocs(extraFiles = []) {
-  const merged = { updated: BUNDLED.updated, packages: [...BUNDLED.packages], extensions: [], markers: structuredClone(BUNDLED.markers) };
+  const merged = { updated: BUNDLED.updated, packages: [...BUNDLED.packages], extensions: [], images: [...(BUNDLED.images || [])], markers: structuredClone(BUNDLED.markers) };
   for (const f of extraFiles) {
     const j = JSON.parse(readFileSync(f, 'utf8'));
     merged.packages.push(...(j.packages || []));
     merged.extensions.push(...(j.extensions || []));
+    merged.images.push(...(j.images || []));
     for (const [k, v] of Object.entries(j.markers || {})) merged.markers[k] = [...new Set([...(merged.markers[k] || []), ...v])];
     if (j.updated && j.updated > merged.updated) merged.updated = j.updated;
   }
@@ -207,7 +208,10 @@ export function scanHostPersistence(ctx) {
   const out = [];
   const m = ctx.iocs.markers;
   for (const f of m.files || []) {
-    if (process.platform !== 'win32' && ctx.checkTmp && exists(f)) out.push({ id: 'persistence.ioc-file', category: 'persistence', severity: 'critical', incident: 'subql', title: `Infection marker ${f} present`, location: f, detail: '@subql/common@5.8.3 leaves this lock file. Its detached stealer survives `npm uninstall`; isolate and rebuild the host.' });
+    if (process.platform === 'win32' || !ctx.checkTmp || !exists(f)) continue;
+    const ll = /remote_code_loader|\.pc_once_/.test(f);
+    out.push({ id: 'persistence.ioc-file', category: 'persistence', severity: 'critical', incident: ll ? 'litellm' : 'subql', title: `Infection marker ${f} present`, location: f,
+      detail: ll ? 'Left by the litellm 1.107.0 payload (loader lock or upload marker). The upload marker means exfiltration succeeded. Do not start Python/pip first: delete cook.pth, cook.py, sitecustomize.py from site-packages, kill the loader, rebuild, then rotate.' : '@subql/common@5.8.3 leaves this lock file. Its detached stealer survives `npm uninstall`; isolate and rebuild the host.' });
   }
   if (!ctx.exec) return out;
   const cron = ctx.exec('crontab', ['-l']);

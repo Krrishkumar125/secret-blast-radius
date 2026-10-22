@@ -168,8 +168,8 @@ test('cooldown advice is tailored to the package manager in use and recognises y
   const { root, cleanup } = fixture({ 'proj/yarn.lock': '', 'b/bun.lock': '{}', 'b/bunfig.toml': '[install]\nminimumReleaseAge = 259200\n' });
   t.after(cleanup);
   const yarn = scan({ home: root, projects: [join(root, 'proj')], env: {}, exec: false, only: ['hardening'] }).findings.find((f) => f.id === 'hardening.release-age');
-  assert.match(yarn.detail, /npmMinimalAgeGate/);
-  assert.ok(!/min-release-age/.test(yarn.detail));
+  assert.match(yarn.fix, /npmMinimalAgeGate/);
+  assert.ok(!/min-release-age/.test(yarn.fix));
   const bun = scan({ home: root, projects: [join(root, 'b')], env: {}, exec: false, only: ['hardening'] }).findings.find((f) => f.id === 'hardening.release-age');
   assert.equal(bun, undefined);
 });

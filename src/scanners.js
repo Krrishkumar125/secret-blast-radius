@@ -308,7 +308,7 @@ export function scanAiConfigs(ctx) {
     try { json = JSON.parse(text); } catch { continue; }
     for (const { name, server } of mcpServersFrom(json)) {
       const pkg = unpinnedNpx(server);
-      if (pkg) out.push({ id: 'ai.mcp-unpinned', category: 'ai', severity: 'low', title: `MCP server "${name}" runs an unpinned package (${pkg})`, location: tilde(ctx, f),
+      if (pkg) out.push({ id: 'ai.mcp-unpinned', category: 'ai', severity: 'low', title: `MCP server "${name}" runs an unpinned package (${pkg})`, location: tilde(ctx, f), fix: `Change the arg to "${pkg}@<exact version>" (find it with \`npm view ${pkg} version\`).`,
         detail: '`npx -y <pkg>` fetches whatever version is latest every time the agent starts, with your agent\'s environment. Pin an exact version (pkg@1.2.3) so a hijacked release is not pulled in automatically.' });
       for (const hit of literalSecretsInServer(server)) {
         out.push({
@@ -428,6 +428,7 @@ export function scanHardening(ctx) {
       id: 'hardening.ignore-scripts', category: 'hardening', severity: 'low',
       title: 'npm runs dependency install scripts', location: '~/.npmrc',
       detail: 'Every malicious package this year ran from preinstall/postinstall. Consider `ignore-scripts=true` (or pnpm, which blocks dependency builds by default) and allow-list the few that need it.',
+      fix: '`npm config set ignore-scripts true` (user-wide) or add `ignore-scripts=true` to the project .npmrc; run needed builds explicitly (`npm rebuild <pkg>`).',
     });
   }
   const pnpmWs = ctx.projects.map((p) => readText(join(p, 'pnpm-workspace.yaml'))).filter(Boolean).join('\n');
@@ -444,7 +445,8 @@ export function scanHardening(ctx) {
     out.push({
       id: 'hardening.release-age', category: 'hardening', severity: 'low',
       title: 'No dependency cooldown configured', location: 'package manager config',
-      detail: `Malicious versions are usually pulled within hours. ${tips.join('; ')}. A cooldown would not have caught a compromise that went unnoticed for longer.`,
+      detail: 'Malicious versions are usually pulled within hours (litellm 1.107.0: under 2h; tensorlake 0.5.144: under 2h). A cooldown would not catch a compromise that goes unnoticed for longer.',
+      fix: tips.join('; ') + '.',
     });
   }
   return out;
