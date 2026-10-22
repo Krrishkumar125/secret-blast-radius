@@ -1,6 +1,6 @@
 {
   "name": "secret-blast-radius",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "What would a malicious npm install steal from this machine or CI runner? Ranked inventory of reachable credentials, known-worm IOCs (Shai-Hulud, @subql, GhostAction), PHP2Shell and PaaS exposure checks, ordered rotation runbook, SARIF. Read-only, offline, never prints secrets.",
   "license": "MIT",
   "author": "Krrish Kumar (https://github.com/Krrishkumar125)",
