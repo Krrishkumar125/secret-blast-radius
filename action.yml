@@ -1,0 +1,41 @@
+name: secret-blast-radius
+description: Find what a malicious install could steal in this job and repo (worm IOCs, GhostAction workflows, PHP2Shell, exposed CI secrets). Read-only; never prints secrets.
+author: Krrish Kumar
+branding:
+  icon: shield
+  color: red
+inputs:
+  only:
+    description: Comma list of scanners. Default is the set that makes sense on a CI runner.
+    default: malicious,repo,php,certs,install-scripts,env,npm,dotenv
+  fail-on:
+    description: critical | high | medium | low | none
+    default: critical
+  incident:
+    description: Optional incident name (php2shell, railway, tensorlake, shai-hulud, subql, ghostaction, emudhra, sbi)
+    default: ''
+  sarif-file:
+    description: Where to write SARIF (upload it with github/codeql-action/upload-sarif)
+    default: secret-blast-radius.sarif
+  version:
+    description: npm version or dist-tag of secret-blast-radius to run
+    default: '0'
+outputs:
+  sarif-file:
+    description: Path of the SARIF report
+    value: ${{ inputs.sarif-file }}
+runs:
+  using: composite
+  steps:
+    - name: Run secret-blast-radius
+      shell: bash
+      env:
+        SBR_ONLY: ${{ inputs.only }}
+        SBR_FAIL_ON: ${{ inputs.fail-on }}
+        SBR_INCIDENT: ${{ inputs.incident }}
+        SBR_SARIF: ${{ inputs.sarif-file }}
+        SBR_VERSION: ${{ inputs.version }}
+      run: |
+        args=(--only "$SBR_ONLY" --fail-on "$SBR_FAIL_ON" --sarif-file "$SBR_SARIF")
+        if [ -n "$SBR_INCIDENT" ]; then args+=(--incident "$SBR_INCIDENT"); fi
+        npx --yes "secret-blast-radius@${SBR_VERSION}" "${args[@]}" .

@@ -1,0 +1,251 @@
+{
+ "updated": "2026-10-22",
+ "packages": [
+  {
+   "ecosystem": "npm",
+   "name": "tensorlake",
+   "versions": [
+    "0.5.144"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "tensorlake",
+   "safe": "0.5.143 or 0.5.145+",
+   "ref": "https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "tensorlake-native-darwin-arm64",
+   "versions": [
+    "0.5.144"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "tensorlake",
+   "safe": "0.5.143",
+   "ref": "https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "tensorlake-native-linux-arm64-gnu",
+   "versions": [
+    "0.5.144"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "tensorlake",
+   "safe": "0.5.143",
+   "ref": "https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "tensorlake-native-linux-arm64-musl",
+   "versions": [
+    "0.5.144"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "tensorlake",
+   "safe": "0.5.143",
+   "ref": "https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "tensorlake-native-linux-x64-gnu",
+   "versions": [
+    "0.5.144"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "tensorlake",
+   "safe": "0.5.143",
+   "ref": "https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "tensorlake-native-linux-x64-musl",
+   "versions": [
+    "0.5.144"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "tensorlake",
+   "safe": "0.5.143",
+   "ref": "https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "tensorlake-native-win32-x64",
+   "versions": [
+    "0.5.144"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "tensorlake",
+   "safe": "0.5.143",
+   "ref": "https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "@subql/common",
+   "versions": [
+    "5.8.3"
+   ],
+   "campaign": "subql",
+   "incident": "subql",
+   "safe": "5.8.2",
+   "ref": "https://osv.dev/vulnerability/MAL-2026-17571"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "@7nohe/openapi-react-query-codegen",
+   "versions": [
+    "0.0.0-365d4eb738d3146583431948d3ba6e27a32556be",
+    "0.0.0-ec7876d6c917dad516ba69bbfafc948b834bf0ab",
+    "0.5.4",
+    "0.5.5",
+    "1.6.3",
+    "1.6.4",
+    "2.2.1",
+    "2.2.2",
+    "3.0.3",
+    "3.0.4"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "0.5.3 / 1.6.2 / 2.2.0 / 3.0.2",
+   "ref": "https://socket.dev/blog/openapi-react-query-codegen-npm-compromise"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "keyv",
+   "versions": [
+    "6.0.0"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "5.6.0",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "cacheable",
+   "versions": [
+    "2.5.1"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "2.5.0",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "cacheable-request",
+   "versions": [
+    "13.0.20"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "13.0.19",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "cache-manager",
+   "versions": [
+    "7.2.10"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "7.2.9",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "flat-cache",
+   "versions": [
+    "6.1.24"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "6.1.23",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "file-entry-cache",
+   "versions": [
+    "11.1.6"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "11.1.5",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "@cacheable/utils",
+   "versions": [
+    "2.5.1"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "the release before the listed version (see advisory)",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "@cacheable/memory",
+   "versions": [
+    "2.2.1"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "the release before the listed version (see advisory)",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "@cacheable/node-cache",
+   "versions": [
+    "3.1.2"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "the release before the listed version (see advisory)",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  },
+  {
+   "ecosystem": "npm",
+   "name": "@cacheable/net",
+   "versions": [
+    "2.1.1"
+   ],
+   "campaign": "mini-shai-hulud",
+   "incident": "shai-hulud",
+   "safe": "the release before the listed version (see advisory)",
+   "ref": "https://www.sonatype.com/blog/mini-shai-hulud-npm-attack-more-than-2200-components-impacted"
+  }
+ ],
+ "markers": {
+  "ips": [
+   "193.32.204.199"
+  ],
+  "domains": [
+   "iseekaigogo.com",
+   "ci-artifacts.dev",
+   "npm-cache.com",
+   "my-github.com"
+  ],
+  "files": [
+   "/tmp/tmp.ts018051808.lock"
+  ],
+  "cron": [
+   "#ghc2",
+   "193.32.204.199"
+  ],
+  "processes": [
+   "manifest-cache.js --warm",
+   "gh-token-monitor"
+  ],
+  "branches": [
+   "dependabot/github_actions/format/setup-formatter"
+  ],
+  "optionalDependencies": [
+   "@opensearch/setup"
+  ]
+ }
+}

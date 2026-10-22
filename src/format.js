@@ -1,4 +1,5 @@
 import { runbook } from './index.js';
+import { INCIDENTS } from './incidents.js';
 
 const ICON = { critical: '✖', high: '▲', medium: '●', low: '·' };
 
@@ -9,8 +10,14 @@ export function formatText(result, { color = false } = {}) {
   const { counts } = result;
   lines.push(c('1', 'secret-blast-radius') + ' — what a malicious install script could steal from this machine right now');
   lines.push('');
+  if (result.incident) {
+    const inc = INCIDENTS[result.incident];
+    lines.push(c('1', inc.title), c('2', inc.status), '');
+    inc.checklist.forEach((x, i) => lines.push(`  ${i + 1}. ${x}`));
+    lines.push('', ...inc.refs.map((r) => `  ${c('2', r)}`), '', c('1', 'What this machine/project has that matters for this incident:'), '');
+  }
   if (!result.findings.length) {
-    lines.push('No reachable secrets found in the places checked. Nice.');
+    lines.push(result.incident ? 'Nothing relevant found by these checks.' : 'No reachable secrets found in the places checked. Nice.');
     return lines.join('\n');
   }
   for (const f of result.findings) {
@@ -28,6 +35,10 @@ export function formatText(result, { color = false } = {}) {
 
 export function formatMarkdown(result) {
   const out = ['# Secret rotation runbook', '', `Generated ${result.scannedAt} by secret-blast-radius. Values are never included; fingerprints let you match items.`, ''];
+  if (result.incident) {
+    const inc = INCIDENTS[result.incident];
+    out.push(`## Incident: ${inc.title}`, '', `_${inc.status}_`, '', ...inc.checklist.map((x) => `- [ ] ${x}`), '', ...inc.refs.map((r) => `- ${r}`), '');
+  }
   const rb = runbook(result);
   if (!rb.length) return out.concat('Nothing to rotate: no reachable secrets were found.').join('\n');
   out.push('Work top to bottom. The order matters: stop persistence first, then the credentials a worm uses to spread (npm, GitHub), then everything else.', '');

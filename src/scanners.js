@@ -61,6 +61,17 @@ export function scanNpmrc(ctx) {
   return out;
 }
 
+export function scanPypirc(ctx) {
+  const f = join(ctx.home, '.pypirc');
+  const t = readText(f);
+  if (!t) return [];
+  return [...t.matchAll(/^\s*password\s*[=:]\s*(\S+)/gm)].filter((m) => !isReference(m[1])).map((m) => ({
+    id: 'pypi.plaintext-token', category: 'npm', severity: m[1].startsWith('pypi-') ? 'critical' : 'high',
+    title: 'Plaintext PyPI credential in ~/.pypirc', location: tilde(ctx, f), fingerprint: fingerprint(m[1]),
+    detail: 'Lets a stealer publish to your PyPI projects. Revoke at pypi.org/manage/account/token and use trusted publishing.',
+  }));
+}
+
 /* ---------------- 2. GitHub ---------------- */
 export function scanGitHub(ctx) {
   const out = [];
@@ -287,6 +298,10 @@ export function scanAiConfigs(ctx) {
       }
     }
   }
+  for (const [rel, label] of [['.claude/.credentials.json', 'Claude Code login'], ['.gemini/oauth_creds.json', 'Gemini CLI OAuth tokens']]) {
+    const f = join(ctx.home, ...rel.split('/'));
+    if (readText(f)) out.push({ id: 'ai.cli-login', category: 'ai', severity: 'medium', title: `${label} stored in a file`, location: tilde(ctx, f), detail: 'Read verbatim by the GhostAction fake-font stealer. Sign out and back in to rotate if this machine is exposed.' });
+  }
   // Codex CLI auth file stores an API key / refresh token.
   for (const f of [join(ctx.home, '.codex', 'auth.json')]) {
     const t = readText(f);
@@ -362,7 +377,7 @@ export function scanDotenv(ctx) {
   for (const root of ctx.projects) {
     for (const f of walk(root, { maxDepth: ctx.depth, skip: SKIP_DIRS })) {
       const base = f.split(/[\\/]/).pop();
-      if (!/^\.env(\..+)?$/.test(base) || /\.(example|sample|template|dist|defaults)$/i.test(base)) continue;
+      if (!/^\.env(\..+)?$/.test(base) || /\.(example|sample|template|dist|defaults|demo)$/i.test(base)) continue;
       const text = readText(f);
       if (!text) continue;
       const secrets = parseDotenv(text).filter(([k, v]) => isSecretPair(k, v));
@@ -406,7 +421,7 @@ export function scanHardening(ctx) {
 
 export const SCANNERS = {
   persistence: scanPersistence,
-  npm: scanNpmrc,
+  npm: (ctx) => [...scanNpmrc(ctx), ...scanPypirc(ctx)],
   github: scanGitHub,
   cloud: scanCloud,
   kubernetes: scanKubeDocker,

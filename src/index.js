@@ -1,6 +1,20 @@
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { SCANNERS } from './scanners.js';
+import { SUPPLY_SCANNERS, loadIocs } from './supply.js';
+import { INCIDENTS } from './incidents.js';
+
+export const ALL_SCANNERS = { ...SCANNERS, ...SUPPLY_SCANNERS };
+
+function defaultExec(cmd, args) {
+  try {
+    const r = spawnSync(cmd, args, { encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'] });
+    return r.status === 0 ? r.stdout : null;
+  } catch {
+    return null;
+  }
+}
 
 export const SEVERITY = ['critical', 'high', 'medium', 'low'];
 
@@ -50,6 +64,21 @@ export const ROTATION = {
     steps: ['Generate a new key (`ssh-keygen -t ed25519`) with a passphrase.', 'Replace the public key on GitHub/GitLab and in every server\'s authorized_keys; remove the old one.'],
     url: 'https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent',
   },
+  paas: {
+    order: 5.5, label: 'Deploy platforms (Railway, Vercel, Fly, Render, Heroku, Netlify)',
+    steps: ['Rotate every secret stored in the platform\'s env store at its provider (DB, Stripe, AI keys), then update the variable.', 'Redeploy: services read env vars at start-up.', 'Log the CLI out and back in, and revoke old platform tokens.'],
+    url: 'https://blog.railway.com/p/security-disclosure-wednesday-october-21st',
+  },
+  php: {
+    order: 9, label: 'Patch PHP (PHP2Shell)',
+    steps: ['Update to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 or later; PHP ≤ 8.1 must be upgraded.', 'Rebuild images with --pull --no-cache and restart all PHP workers.'],
+    url: 'https://www.cisa.gov/news-events/alerts/2026/10/21/critical-vulnerabilities-php-require-immediate-patching',
+  },
+  certs: {
+    order: 10, label: 'Replace certificates under emSign ECC Root CA - G3',
+    steps: ['Issue a replacement certificate from another CA before Oct 27, 2026.', 'Remove the root from custom trust bundles.'],
+    url: 'https://blog.google/security/protecting-chrome-and-android-users-from-compromised-emudhra-intermediate-ca-certificates/',
+  },
   dotenv: {
     order: 8, label: 'Application secrets in .env files',
     steps: ['Rotate database passwords, payment keys and webhook secrets at each provider.', 'Redeploy: most platforms only read env vars at process start.'],
@@ -63,17 +92,27 @@ export function scan(options = {}) {
     projects: (options.projects?.length ? options.projects : [process.cwd()]).map((p) => resolve(p)),
     env: options.env ?? process.env,
     depth: options.depth ?? 4,
+    iocs: options.iocs ?? loadIocs(options.iocFiles ?? []),
+    exec: options.exec === false ? null : options.exec ?? defaultExec,
+    checkTmp: options.checkTmp ?? options.home === undefined,
   };
-  const only = options.only ? new Set(options.only) : null;
+  let onlyList = options.only;
+  if (options.incident) {
+    const inc = INCIDENTS[options.incident];
+    if (!inc) throw new Error(`Unknown incident "${options.incident}". Use one of: ${Object.keys(INCIDENTS).join(', ')}`);
+    onlyList = onlyList ? onlyList.filter((s) => inc.scanners.includes(s)) : inc.scanners;
+  }
+  for (const s of [...(onlyList ?? []), ...(options.skip ?? [])]) if (!ALL_SCANNERS[s]) throw new Error(`Unknown scanner "${s}". Use: ${Object.keys(ALL_SCANNERS).join(', ')}`);
+  const only = onlyList ? new Set(onlyList) : null;
   const skip = new Set(options.skip ?? []);
   const findings = [];
-  for (const [name, fn] of Object.entries(SCANNERS)) {
+  for (const [name, fn] of Object.entries(ALL_SCANNERS)) {
     if ((only && !only.has(name)) || skip.has(name)) continue;
     findings.push(...fn(ctx));
   }
   findings.sort((a, b) => SEVERITY.indexOf(a.severity) - SEVERITY.indexOf(b.severity) || (ROTATION[a.category]?.order ?? 99) - (ROTATION[b.category]?.order ?? 99));
   const counts = Object.fromEntries(SEVERITY.map((s) => [s, findings.filter((f) => f.severity === s).length]));
-  return { scannedAt: new Date().toISOString(), home: ctx.home, projects: ctx.projects, counts, findings };
+  return { scannedAt: new Date().toISOString(), home: ctx.home, projects: ctx.projects, iocsUpdated: ctx.iocs.updated, incident: options.incident, counts, findings };
 }
 
 export function runbook(result) {
@@ -89,3 +128,6 @@ export function failsAt(result, level) {
 }
 
 export { formatText, formatMarkdown } from './format.js';
+export { toSarif } from './sarif.js';
+export { INCIDENTS } from './incidents.js';
+export { loadIocs, parseLockfile, phpStatus } from './supply.js';

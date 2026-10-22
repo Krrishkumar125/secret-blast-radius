@@ -31,3 +31,6 @@ jobs:
           npm install --ignore-scripts "$RUNNER_TEMP/$T"
           npx secret-blast-radius --version
           npx secret-blast-radius --no-env --fail-on none .
+          npx secret-blast-radius --list-incidents
+          npx secret-blast-radius --incident php2shell --sarif-file out.sarif --no-env .
+          node -e "JSON.parse(require('fs').readFileSync('out.sarif','utf8'))"

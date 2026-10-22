@@ -46,3 +46,24 @@ test('cli: --help and --version', () => {
   assert.match(cli(['--help']).stdout, /Usage: secret-blast-radius/);
   assert.match(cli(['--version']).stdout.trim(), /^\d+\.\d+\.\d+$/);
 });
+
+test('cli: --incident, --list-incidents, --sarif-file, --no-exec, bad incident', (t) => {
+  const f = fixture({ 'home/x': '', 'proj/railway.toml': '', 'proj/.env': `STRIPE_SECRET_KEY=${FAKE.stripe}\n`, 'proj/Dockerfile': 'FROM php:8.3.1-fpm\n' });
+  t.after(f.cleanup);
+  const base = ['--home', join(f.root, 'home'), '--no-env', '--no-exec', join(f.root, 'proj')];
+  const inc = cli(['--incident', 'railway', ...base]);
+  assert.equal(inc.status, 0, inc.stderr);
+  assert.match(inc.stdout, /Roll every environment variable/);
+  assert.ok(!inc.stdout.includes('PHP2Shell'));
+  assert.ok(!inc.stdout.includes(FAKE.stripe));
+  assert.match(cli(['--list-incidents']).stdout, /php2shell[\s\S]*emudhra[\s\S]*sbi/);
+  assert.equal(cli(['--incident', 'nope', ...base]).status, 2);
+  const out = join(f.root, 'r.sarif');
+  const s = cli(['--sarif-file', out, '--fail-on', 'critical', ...base]);
+  assert.equal(s.status, 1);
+  const sarif = JSON.parse(readFileSync(out, 'utf8'));
+  assert.ok(sarif.runs[0].results.some((r) => r.ruleId === 'php.php2shell' && r.locations[0].physicalLocation.artifactLocation.uri === 'Dockerfile'));
+  assert.ok(!readFileSync(out, 'utf8').includes(FAKE.stripe));
+  const stdoutSarif = JSON.parse(cli(['--sarif', ...base]).stdout);
+  assert.equal(stdoutSarif.version, '2.1.0');
+});

@@ -220,3 +220,16 @@ test('dotenv: placeholders and credential-free URLs are not secrets (seen in Tan
   t.after(f.cleanup);
   assert.equal(run(f.root, ['dotenv']).findings.length, 0);
 });
+
+test('dotenv: obvious placeholders and .demo files are ignored (seen in symfony/demo)', (t) => {
+  const f = fixture({ 'proj/.env': 'APP_SECRET=not-a-secret--read-the-doc!\nJWT_SECRET=changeme-in-prod\n', 'proj/.env.local.demo': 'APP_SECRET=abcdef0123456789\n', 'home/x': '' });
+  t.after(f.cleanup);
+  assert.equal(run(f.root, ['dotenv']).findings.length, 0);
+});
+
+test('dotenv: hyphenated prose values are treated as examples (seen in vercel/next.js examples)', (t) => {
+  const f = fixture({ 'proj/.env': 'LOCAL_SECRET=local-secret\nTOKEN_SECRET="this-is-a-secret-value-with-at-least-32-characters"\nREAL_SECRET=Zx81-kQ02-pp9W-a7Lm\n', 'home/x': '' });
+  t.after(f.cleanup);
+  const r = run(f.root, ['dotenv']);
+  assert.deepEqual(r.findings[0].names, ['REAL_SECRET']);
+});

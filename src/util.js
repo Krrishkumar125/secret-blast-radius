@@ -64,6 +64,7 @@ export function isReference(value) {
   if (/^(your|enter|insert|replace|add)[-_ ]?(your[-_ ]?)?[a-z_ -]*(here)?$/i.test(v) || /_here$/i.test(v)) return true;
   if (/^\$\{\{.*\}\}$/.test(v)) return true; // ${{ secrets.X }} (GitHub Actions)
   if (/^(x{4,}|\*{4,}|your[-_ ].*|changeme|placeholder|todo|redacted)$/i.test(v)) return true;
+  if (/not[-_ ]?a[-_ ]?(real[-_ ]?)?secret|^change[-_ ]?me|^dummy|^placeholder|^replace[-_ ]?(me|this)|^example|^sample/i.test(v)) return true;
   return false;
 }
 
@@ -81,6 +82,9 @@ export function isSecretPair(name, value) {
   if (value == null || isReference(value)) return false;
   const v = String(value);
   if (tokenKind(v)) return true;
+  // Prose like "local-secret" or "this-is-a-secret-value-..." is a committed example, not a credential.
+  const words = v.replace(/[!.]+$/, '').split(/[-_ .]+/);
+  if (words.length >= 2 && words.every((w) => /^[a-z]+$|^[A-Z]+$|^\d+$/.test(w)) && words.some((w) => /^[a-z]{3,}$/i.test(w))) return false;
   if (URL_NAME.test(name)) return /^[a-z][a-z0-9+.-]*:\/\/[^/\s:@]+:[^@\s]+@/i.test(v) || /[?&](password|token|key|secret)=[^&\s]+/i.test(v);
   return looksLikeSecretName(name) && v.length >= 8;
 }

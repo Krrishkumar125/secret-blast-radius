@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
 import { writeFileSync, readFileSync } from 'node:fs';
-import { scan, failsAt, formatText, formatMarkdown, runbook } from '../src/index.js';
+import { scan, failsAt, formatText, formatMarkdown, runbook, toSarif, INCIDENTS } from '../src/index.js';
 
 const HELP = `Usage: secret-blast-radius [options] [project-dir...]
 
@@ -10,10 +10,17 @@ on this machine or CI runner, ranks it, and writes an ordered rotation runbook.
 Read-only. Never prints secret values.
 
 Options:
+  --incident <name>    Tailored checklist + only the relevant checks. Names:
+                       php2shell, railway, tensorlake, shai-hulud, subql, ghostaction, emudhra, sbi
+  --list-incidents     Show incident names and status
   --json               Machine-readable output
+  --sarif [file]       SARIF 2.1.0 for GitHub code scanning (stdout, or --sarif-file <f>)
+  --ioc-file <f>       Extra IOC JSON (same shape as src/iocs.json); repeatable
+  --no-exec            Never run helper commands (php -r, crontab -l, ps)
   --runbook [file]     Print (or write to file) a Markdown rotation runbook
   --fail-on <level>    Exit 1 if any finding is at/above level: critical|high|medium|low|none (default: none)
-  --only <list>        Comma list of scanners: persistence,npm,github,cloud,kubernetes,env,ai,ssh,dotenv,hardening
+  --only <list>        Comma list of scanners: persistence,npm,github,cloud,kubernetes,env,ai,ssh,dotenv,
+                       hardening,malicious,repo,host-persistence,php,paas,certs,install-scripts
   --skip <list>        Comma list of scanners to skip
   --no-env             Do not inspect environment variables
   --depth <n>          How deep to look for .env files in project dirs (default 4)
@@ -28,7 +35,8 @@ try {
   args = parseArgs({
     allowPositionals: true,
     options: {
-      json: { type: 'boolean' }, runbook: { type: 'boolean' }, 'runbook-file': { type: 'string' },
+      json: { type: 'boolean' }, sarif: { type: 'boolean' }, 'sarif-file': { type: 'string' },
+      incident: { type: 'string' }, 'list-incidents': { type: 'boolean' }, 'ioc-file': { type: 'string', multiple: true }, 'no-exec': { type: 'boolean' }, runbook: { type: 'boolean' }, 'runbook-file': { type: 'string' },
       'fail-on': { type: 'string', default: 'none' }, only: { type: 'string' }, skip: { type: 'string' },
       'no-env': { type: 'boolean' }, depth: { type: 'string' }, home: { type: 'string' },
       'no-color': { type: 'boolean' }, version: { type: 'boolean', short: 'v' }, help: { type: 'boolean', short: 'h' },
@@ -49,20 +57,31 @@ let runbookFile = o['runbook-file'];
 let projects = positionals;
 if (o.runbook && !runbookFile && positionals.length && /\.md$/i.test(positionals[0])) { runbookFile = positionals[0]; projects = positionals.slice(1); }
 
+if (o['list-incidents']) {
+  for (const [k, v] of Object.entries(INCIDENTS)) console.log(`${k.padEnd(12)} ${v.title}\n${' '.repeat(13)}${v.status}`);
+  process.exit(0);
+}
 const list = (s) => (s ? s.split(',').map((x) => x.trim()).filter(Boolean) : undefined);
 const skip = list(o.skip) ?? [];
 if (o['no-env']) skip.push('env');
 
 let result;
 try {
-  result = scan({ projects, home: o.home, only: list(o.only), skip, depth: o.depth ? Number(o.depth) : undefined });
+  result = scan({ projects, home: o.home, only: list(o.only), skip, depth: o.depth ? Number(o.depth) : undefined, incident: o.incident, iocFiles: o['ioc-file'] ?? [], exec: o['no-exec'] ? false : undefined });
   failsAt(result, o['fail-on']);
 } catch (e) {
   console.error(`secret-blast-radius: ${e.message}`);
   process.exit(2);
 }
 
-if (o.json) {
+const version = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
+if (o.sarif || o['sarif-file']) {
+  const sarif = JSON.stringify(toSarif(result, version), null, 2) + '\n';
+  if (o['sarif-file']) { writeFileSync(o['sarif-file'], sarif); if (!o.json) console.error(`SARIF written to ${o['sarif-file']}`); } else process.stdout.write(sarif);
+}
+if (o.sarif && !o['sarif-file']) {
+  // stdout already used for SARIF
+} else if (o.json) {
   process.stdout.write(JSON.stringify({ ...result, runbook: runbook(result).map(({ items, ...r }) => ({ ...r, findings: items.map((i) => i.id) })) }, null, 2) + '\n');
 } else if (o.runbook) {
   const md = formatMarkdown(result);
