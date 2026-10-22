@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [18, 20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - name: Run the packed CLI the way users do
+        shell: bash
+        run: |
+          T=$(npm pack -s --pack-destination "$RUNNER_TEMP")
+          mkdir "$RUNNER_TEMP/try" && cd "$RUNNER_TEMP/try" && npm init -y >/dev/null
+          npm install --ignore-scripts "$RUNNER_TEMP/$T"
+          npx secret-blast-radius --version
+          npx secret-blast-radius --no-env --fail-on none .

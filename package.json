@@ -1,0 +1,20 @@
+{
+  "name": "secret-blast-radius",
+  "version": "0.1.0",
+  "description": "See every credential a malicious npm install script could steal from your machine or CI runner (npm/GitHub tokens, cloud keys, MCP configs, SSH keys, .env), ranked, with an ordered rotation runbook. Read-only; never prints secrets.",
+  "license": "MIT",
+  "author": "Krrish Kumar (https://github.com/Krrishkumar125)",
+  "repository": { "type": "git", "url": "git+https://github.com/Krrishkumar125/secret-blast-radius.git" },
+  "homepage": "https://github.com/Krrishkumar125/secret-blast-radius#readme",
+  "bugs": "https://github.com/Krrishkumar125/secret-blast-radius/issues",
+  "keywords": ["security", "supply-chain", "npm", "shai-hulud", "secrets", "credentials", "rotation", "incident-response", "mcp", "ci", "devsecops"],
+  "type": "module",
+  "bin": { "secret-blast-radius": "bin/cli.js" },
+  "exports": { ".": "./src/index.js" },
+  "files": ["bin", "src", "README.md", "LICENSE"],
+  "engines": { "node": ">=18.18" },
+  "scripts": {
+    "test": "node --test test/",
+    "check": "node --check bin/cli.js && node --test test/"
+  }
+}

@@ -1,0 +1,40 @@
+import { runbook } from './index.js';
+
+const ICON = { critical: '✖', high: '▲', medium: '●', low: '·' };
+
+export function formatText(result, { color = false } = {}) {
+  const c = (code, s) => (color ? `\x1b[${code}m${s}\x1b[0m` : s);
+  const sev = { critical: (s) => c('1;31', s), high: (s) => c('31', s), medium: (s) => c('33', s), low: (s) => c('2', s) };
+  const lines = [];
+  const { counts } = result;
+  lines.push(c('1', 'secret-blast-radius') + ' — what a malicious install script could steal from this machine right now');
+  lines.push('');
+  if (!result.findings.length) {
+    lines.push('No reachable secrets found in the places checked. Nice.');
+    return lines.join('\n');
+  }
+  for (const f of result.findings) {
+    lines.push(`${sev[f.severity](`${ICON[f.severity]} ${f.severity.toUpperCase().padEnd(8)}`)} ${f.title}`);
+    lines.push(`  ${c('2', f.location + (f.fingerprint ? `  ${f.fingerprint}` : '') + (f.ageDays != null ? `  (${f.ageDays}d old)` : ''))}`);
+    lines.push(`  ${f.detail}`);
+    lines.push('');
+  }
+  lines.push(`Summary: ${counts.critical} critical, ${counts.high} high, ${counts.medium} medium, ${counts.low} low.`);
+  const rb = runbook(result);
+  if (rb.length) lines.push(`Rotation order if this machine is ever compromised: ${rb.map((r, i) => `${i + 1}. ${r.category}`).join('  ')}`);
+  lines.push('Run with --runbook for step-by-step rotation, --json for machine output. Secret values are never printed.');
+  return lines.join('\n');
+}
+
+export function formatMarkdown(result) {
+  const out = ['# Secret rotation runbook', '', `Generated ${result.scannedAt} by secret-blast-radius. Values are never included; fingerprints let you match items.`, ''];
+  const rb = runbook(result);
+  if (!rb.length) return out.concat('Nothing to rotate: no reachable secrets were found.').join('\n');
+  out.push('Work top to bottom. The order matters: stop persistence first, then the credentials a worm uses to spread (npm, GitHub), then everything else.', '');
+  rb.forEach((step, i) => {
+    out.push(`## ${i + 1}. ${step.label}`, '');
+    for (const it of step.items) out.push(`- [ ] **${it.title}** — \`${it.location}\`${it.fingerprint ? ` (${it.fingerprint})` : ''}`);
+    out.push('', ...step.steps.map((s) => `1. ${s}`), '', `Reference: ${step.url}`, '');
+  });
+  return out.join('\n');
+}
