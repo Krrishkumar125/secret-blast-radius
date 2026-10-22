@@ -16,6 +16,7 @@ export function formatText(result, { color = false } = {}) {
     inc.checklist.forEach((x, i) => lines.push(`  ${i + 1}. ${x}`));
     lines.push('', ...inc.refs.map((r) => `  ${c('2', r)}`), '', c('1', 'What this machine/project has that matters for this incident:'), '');
   }
+  if (result.osvQueried != null) lines.push(c('2', `OSV: checked ${result.osvQueried} package versions against MAL- advisories (online, opt-in).`), '');
   if (!result.findings.length) {
     lines.push(result.incident ? 'Nothing relevant found by these checks.' : 'No reachable secrets found in the places checked. Nice.');
     return lines.join('\n');
@@ -45,7 +46,10 @@ export function formatMarkdown(result) {
   rb.forEach((step, i) => {
     out.push(`## ${i + 1}. ${step.label}`, '');
     for (const it of step.items) out.push(`- [ ] **${it.title}** — \`${it.location}\`${it.fingerprint ? ` (${it.fingerprint})` : ''}`);
-    out.push('', ...step.steps.map((s) => `1. ${s}`), '', `Reference: ${step.url}`, '');
+    out.push('', ...step.steps.map((s) => `1. ${s}`), '');
+    if (step.verify?.length) out.push('**Verify the old credential is dead:**', '', ...step.verify.map((v) => `- ${v}`), '');
+    if (step.redeploy) out.push('**Redeploy** after updating: running processes keep the old value until restart.', '');
+    out.push(`Docs: ${step.docs.map(([t, u]) => `[${t}](${u})`).join(' · ')}`, '');
   });
   return out.join('\n');
 }

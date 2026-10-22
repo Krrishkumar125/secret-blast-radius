@@ -100,6 +100,7 @@ test('ai: literal secrets in MCP env/headers/args/url are found; ${VAR} referenc
     'MCP server "cli" has a literal secret in args',
     'MCP server "db" has a literal secret in env.DATABASE_URL',
     'MCP server "github" has a literal secret in env.GITHUB_PERSONAL_ACCESS_TOKEN',
+    'MCP server "github" runs an unpinned package (server-github)',
     'MCP server "remote" has a literal secret in headers.Authorization',
     'MCP server "remote" has a literal secret in url query',
   ]);
@@ -159,7 +160,7 @@ test('persistence: gh-token-monitor puts "stop the worm" first in the runbook', 
   const r = run(f.root, ['persistence', 'npm', 'github', 'dotenv']);
   assert.deepEqual(runbook(r).map((s) => s.category), ['persistence', 'npm', 'github', 'dotenv']);
   const md = formatMarkdown(r);
-  assert.ok(md.indexOf('BEFORE revoking') < md.indexOf('npm token revoke'));
+  assert.ok(md.indexOf('BEFORE revoking') < md.indexOf('npm token delete'));
   assertNoLeak(md);
 });
 

@@ -13,6 +13,17 @@ export const INCIDENTS = {
     ],
     refs: ['https://thephp.foundation/blog/2026/10/21/todays-php-security-release-and-how-were-strengthening-php-security/', 'https://www.cisa.gov/news-events/alerts/2026/10/21/critical-vulnerabilities-php-require-immediate-patching'],
   },
+  glassworm: {
+    title: 'GlassWorm — malicious and sleeper Open VSX / VS Code extensions (Mar–Oct 2026)',
+    status: 'Confirmed by Socket research; extensions removed from Open VSX after reports. Sleeper extensions were benign when published and are flagged as high risk, not proven malicious.',
+    scanners: ['extensions', 'persistence', 'host-persistence', 'github', 'npm'],
+    checklist: [
+      'Uninstall every flagged extension in every editor (VS Code, Cursor, Windsurf, VSCodium, remote servers). Extension packs can pull a flagged extension in transitively.',
+      'From a clean machine, rotate GitHub, npm and Open VSX tokens and move crypto wallets: these are what GlassWorm steals.',
+      'Turn off extension auto-update for publishers you do not know; prefer verified publishers.',
+    ],
+    refs: ['https://socket.dev/blog/open-vsx-transitive-glassworm-campaign', 'https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm', 'https://socket.dev/blog/glassworm-loader-hits-open-vsx-via-suspected-developer-account-compromise'],
+  },
   railway: {
     title: 'Railway environment-variable exposure (disclosed Oct 21, 2026)',
     status: 'Confirmed by Railway; scope still being determined ("may be limited to a subset of users"). Railway advises all users to act.',
@@ -29,7 +40,7 @@ export const INCIDENTS = {
   tensorlake: {
     title: 'tensorlake@0.5.144 — Mini Shai-Hulud worm with gh-token-monitor dead-man\'s switch (Oct 8, 2026)',
     status: 'Confirmed by the maintainer (GHSA-8g63-53c9-65j2), Socket, StepSecurity and Aikido.',
-    scanners: ['malicious', 'persistence', 'host-persistence', 'repo', 'npm', 'github', 'cloud', 'kubernetes', 'ssh', 'ai', 'dotenv', 'env'],
+    scanners: ['malicious', 'npm-cache', 'history', 'ecosystems', 'persistence', 'host-persistence', 'repo', 'npm', 'github', 'cloud', 'kubernetes', 'ssh', 'ai', 'dotenv', 'env'],
     checklist: [
       'Search lockfiles and CI logs for tensorlake@0.5.144 and tensorlake-native-*@0.5.144 (live 01:12–02:54 UTC, Oct 8).',
       'If it ran: disconnect, then REMOVE gh-token-monitor before revoking any GitHub token (revocation triggers `rm -rf ~`).',
@@ -42,7 +53,7 @@ export const INCIDENTS = {
   subql: {
     title: '@subql/common@5.8.3 — credential stealer + remote shell (Oct 5, 2026)',
     status: 'Confirmed: GHSA-9333-3c4x-x3h5 / MAL-2026-17571; analysed by StepSecurity and GMO Flatt Security.',
-    scanners: ['malicious', 'host-persistence', 'cloud', 'github', 'npm', 'ssh', 'kubernetes', 'env', 'dotenv'],
+    scanners: ['malicious', 'npm-cache', 'history', 'ecosystems', 'host-persistence', 'cloud', 'github', 'npm', 'ssh', 'kubernetes', 'env', 'dotenv'],
     checklist: [
       'Search lockfiles, caches and CI logs for @subql/common@5.8.3. 5.8.2 is the last known-good release.',
       '`--ignore-scripts` is NOT enough: importing the package also starts the payload.',
@@ -55,7 +66,7 @@ export const INCIDENTS = {
   ghostaction: {
     title: 'GhostAction — malicious "security audit" workflows + VS Code fake-font stealer (Oct 7–15, 2026)',
     status: 'Confirmed by StepSecurity, Socket, GitGuardian and OpenSourceMalware. ~1,900 accounts, 30,000+ repos targeted.',
-    scanners: ['repo', 'host-persistence', 'github', 'npm', 'cloud', 'kubernetes', 'ssh', 'ai'],
+    scanners: ['repo', 'host-persistence', 'github', 'npm', 'cloud', 'kubernetes', 'ssh', 'ai', 'ecosystems'],
     checklist: [
       'Revoke GitHub sessions, PATs, OAuth grants (incl. client ID Ov23ctrqCqZ79UaYKwyq), SSH and deploy keys FIRST: deleting the workflow does not revoke the token that pushed it.',
       'In every repo you can write to, remove workflows contacting 193.32.204.199 (security-audit.yml, lint.yml, ci-check.yml, …), .vscode/tasks.json "eslint-check" tasks and public/fonts/*.woff2 files that are really JS.',

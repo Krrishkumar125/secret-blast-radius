@@ -34,6 +34,8 @@ Rotation order if this machine is ever compromised: 1. persistence  2. npm  3. a
 
 *(Illustrative output: fingerprints and paths are examples.)*
 
+**New in 0.3:** `--history` shows the dates a bad version sat in your lockfile; GlassWorm editor-extension check; npm cache check; RubyGems/Cargo/Composer/Terraform/Pulumi credential files; opt-in `--osv` malicious-package lookup; a rotation plan with verify steps and provider docs.
+
 ## Why this exists
 
 The last few weeks, in order:
@@ -63,12 +65,16 @@ Every advisory ends the same way: *"rotate everything the machine could access."
 | `dotenv` | `.env*` files in your projects (names only, never values) |
 | `env` | Variables a CI step inherits (`NPM_TOKEN`, `AWS_*`, recognised token formats) |
 | `paas` | Railway, Vercel, Fly, Render, Netlify CLI tokens; Heroku in `~/.netrc`; which projects deploy where |
+| `ecosystems` | RubyGems `~/.gem/credentials`, Cargo `credentials.toml` (the plaintext `cargo:token` store), Composer `auth.json` (global and project), Terraform `credentials.tfrc.json`, Pulumi `credentials.json`, local `.tfstate` files |
 
 **Signs you're already hit:**
 
 | Scanner | Detects |
 |---|---|
 | `malicious` | Known-bad versions in `package-lock.json`, `npm-shrinkwrap.json`, `pnpm-lock.yaml` (v5–v9), `yarn.lock` (classic + Berry), `bun.lock`, and in `node_modules`: tensorlake + native packages, `@subql/common@5.8.3`, `@7nohe/openapi-react-query-codegen` (10 versions), the keyv/cacheable wave; the `@opensearch/setup` worm marker |
+| `extensions` | Installed VS Code / Cursor / Windsurf / VSCodium / Kiro / remote-server extensions against 149 GlassWorm IOCs from Socket (malicious, version-scoped, and flagged sleepers), including ones pulled in through `extensionPack` |
+| `npm-cache` | Tarballs of known-bad versions in the npm cache index: proof the machine downloaded one even if no lockfile shows it today |
+| `history` (`--history`) | **Exposure window.** Walks each lockfile's git history and reports when a known-bad version entered and left (`2026-10-08 → 2026-10-10`), so you know which CI runs and machines to treat as exposed. `--since 2026-09-01` narrows it |
 | `persistence` | `gh-token-monitor` (systemd unit, LaunchAgent, Windows dir, script) |
 | `host-persistence` | Crontab lines that pipe a server into `bash` (GhostAction `#ghc2`), the `manifest-cache.js --warm` process and `/tmp/tmp.ts018051808.lock` (@subql) |
 | `repo` | Workflows that contact GhostAction infrastructure, dump `git log -p --all`, or serialise `toJSON(secrets)` to the network; `.vscode/tasks.json` that auto-runs a "font"/image; Claude Code hooks that run disguised files; the tensorlake worm branch |
@@ -80,13 +86,23 @@ Every advisory ends the same way: *"rotate everything the machine could access."
 | `php` | PHP2Shell-vulnerable PHP in Dockerfiles, compose files, `composer.json` platform pins and the local `php` binary. Distro builds are flagged *high, verify backport* rather than critical |
 | `certs` | PEM/CRT files and `NODE_EXTRA_CA_CERTS` bundles containing or chaining to the distrusted **emSign ECC Root CA - G3** (eMudhra) |
 | `install-scripts` | Which dependencies run install scripts, straight from the lockfile |
-| `hardening` | No `ignore-scripts`, no dependency cooldown (`min-release-age` / `minimumReleaseAge`) |
+| `hardening` | No `ignore-scripts`; no dependency cooldown, with the right setting for the package manager you use (npm `min-release-age`, pnpm `minimumReleaseAge`, Yarn `npmMinimalAgeGate`, Bun `install.minimumReleaseAge`) |
+
+**Opt-in online check:** `--osv` sends the package names and versions from your lockfiles (nothing else) to the [OSV API](https://google.github.io/osv.dev/post-v1-querybatch/) and reports `MAL-` advisories from the [OpenSSF malicious-packages](https://github.com/ossf/malicious-packages) feed. That covers far more than the bundled list. Vulnerability (CVE/GHSA) results are ignored on purpose; use OSV-Scanner for those.
+
+**Small extras:** least-privilege hints from a token's public prefix (classic `ghp_` PAT, long-lived `AKIA` key), and MCP servers started with an unpinned `npx -y <pkg>`.
+
+## Rotation plan
+
+`--runbook` writes an ordered plan: stop the malware, then registry tokens (npm, PyPI, RubyGems, crates.io), GitHub, cloud and IaC, Kubernetes, deploy platforms, CI env, AI keys, SSH, app secrets. Each step has the exact commands, a **verify** check that the old credential is dead, a **redeploy** reminder where running processes keep old values, and links to the provider's own docs. One example of why the details matter: npm says token revocation can take up to an hour.
+
+Trusted publishing and provenance tell you *where* a package was built. They don't tell you it's safe: `@subql/common@5.8.3` and `tensorlake@0.5.144` both had valid provenance.
 
 ## Incident mode
 
 ```bash
 npx secret-blast-radius --list-incidents
-npx secret-blast-radius --incident tensorlake     # or: shai-hulud, subql, ghostaction, railway, php2shell, emudhra, sbi
+npx secret-blast-radius --incident tensorlake     # or: glassworm, shai-hulud, subql, ghostaction, railway, php2shell, emudhra, sbi
 ```
 
 Runs only the checks that matter for that incident and prints a sourced checklist, marking what's confirmed and what's still under investigation. `--runbook` turns it into a Markdown checklist you can paste into an incident ticket.
@@ -99,7 +115,7 @@ permissions:
   security-events: write
 steps:
   - uses: actions/checkout@v4
-  - uses: Krrishkumar125/secret-blast-radius@v0.2.1
+  - uses: Krrishkumar125/secret-blast-radius@v0.3.0
     with:
       fail-on: critical
   - uses: github/codeql-action/upload-sarif@v3
@@ -114,9 +130,9 @@ SARIF only gets file locations for findings inside the repo. Home-directory find
 ## Safety
 
 - **Read-only.** It only writes files you name (`--runbook-file`, `--sarif-file`).
-- **Offline.** It makes no network requests. The IOC list is bundled (`src/iocs.json`, dated). Add your own with `--ioc-file extra.json`.
+- **Offline by default.** It makes no network requests unless you pass `--osv`, which sends package names and versions only. The IOC lists are bundled (`src/iocs.json`, `src/extension-iocs.json`, dated). Add your own with `--ioc-file extra.json` (`packages` and `extensions` keys).
 - **Secret values are never printed.** Findings show a location and a `sha256:xxxxxxxx` fingerprint. Every output format is tested for leaks.
-- **Zero dependencies.** Helper commands (`php -r`, `crontab -l`, `ps -eo args`) are run read-only with a timeout; `--no-exec` disables them.
+- **Zero dependencies.** Helper commands (`php -v`, `crontab -l`, `ps -eo args`, and `git log`/`git show` for `--history`) are run read-only with a timeout; `--no-exec` disables them.
 
 ## Options
 
@@ -128,6 +144,8 @@ SARIF only gets file locations for findings inside the repo. Home-directory find
 | `--runbook`, `--runbook-file <f>` | Markdown rotation checklist |
 | `--fail-on <level>` | Exit 1 at/above `critical`, `high`, `medium`, `low` (default `none`) |
 | `--only` / `--skip <list>` | Choose scanners (names in the tables above) |
+| `--history`, `--since <date>` | Lockfile exposure window from git history |
+| `--osv` | Online, opt-in OSV malicious-package lookup |
 | `--ioc-file <f>` | Extra IOCs, same shape as `src/iocs.json` (repeatable) |
 | `--no-env`, `--no-exec`, `--depth <n>`, `--home <dir>`, `--no-color` | Tuning |
 
@@ -137,18 +155,33 @@ Exit codes: `0` ok, `1` findings at/above `--fail-on`, `2` usage error.
 
 These are skipped on purpose: `${VAR}`, `${{ secrets.X }}`, `op://…`, `[YOUR_KEY]`, `your_api_key_here`, `not-a-secret`, prose values like `this-is-a-secret-value`, credential-free URLs (`redis://localhost`, `file:./dev.db`), `.env.example/.sample/.template/.demo`, `node_modules`, ordinary `folderOpen` tasks, and Claude hooks that run normal tools. Every rule above came from running the tool on real repos (TanStack Router, symfony/demo, vercel/next.js, docker-library/wordpress, Railway templates). If you hit a false positive, please open an issue.
 
+## Use it with these tools
+
+secret-blast-radius answers one question: *what could have been stolen, and what do I rotate first?* For the rest, use the tools built for it:
+
+| Need | Use |
+|---|---|
+| Secrets committed to git history | [gitleaks](https://github.com/gitleaks/gitleaks) or [TruffleHog](https://github.com/trufflesecurity/trufflehog) (TruffleHog can also verify whether a key is live) |
+| Vulnerable dependencies (CVEs) across ecosystems | [OSV-Scanner](https://github.com/google/osv-scanner) |
+| GitHub Actions risks: `pull_request_target`, unpinned actions, template injection, excessive permissions | [zizmor](https://github.com/zizmorcore/zizmor) |
+| Blocking exfiltration from CI runners at runtime | [StepSecurity Harden-Runner](https://github.com/step-security/harden-runner) |
+| Vetting packages before you install them | [Socket](https://socket.dev) |
+
 ## Limits
 
 - It checks well-known locations. It can't see your OS keychain (that's the point) or browser profiles.
-- The IOC list covers the incidents above, not every malicious package ever published. Pair it with `npm audit`, OSV or Socket.
+- The bundled IOC lists cover the incidents above, not every malicious package ever published. Use `--osv` for the full OpenSSF feed.
+- `--history` follows lockfiles that exist today; a lockfile that was deleted or renamed is not followed. On partial (`--filter=blob:none`) clones it fetches old blobs and is slow.
+- Sleeper extensions were benign when Socket found them. They're flagged as high risk, not proven malicious.
 - For distro PHP builds it can't tell whether your vendor backported the fix.
 - A clean report shrinks your blast radius. It doesn't prove a machine is clean.
 
 ## Programmatic API
 
 ```js
-import { scan, runbook, toSarif, INCIDENTS } from 'secret-blast-radius';
+import { scan, scanAsync, runbook, toSarif, INCIDENTS } from 'secret-blast-radius';
 const result = scan({ projects: ['.'], incident: 'railway', exec: false });
+const withOsv = await scanAsync({ projects: ['.'], osv: true, history: { since: '2026-09-01' } });
 ```
 
 MIT © Krrish Kumar

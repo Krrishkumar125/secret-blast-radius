@@ -54,7 +54,7 @@ export function scanNpmrc(ctx) {
           (publishable
             ? 'Any install script can read this and republish every package you maintain (this is how Shai-Hulud spreads). '
             : 'Any install script can read this registry credential. ') +
-          'Prefer short-lived tokens or npm trusted publishing (OIDC) from CI.',
+          'Prefer short-lived tokens or npm trusted publishing (OIDC) from CI.' + tokenHint(value),
       });
     }
   }
@@ -73,6 +73,15 @@ export function scanPypirc(ctx) {
 }
 
 /* ---------------- 2. GitHub ---------------- */
+/** Least-privilege hint from the token's public prefix only (never the value). */
+export function tokenHint(v) {
+  if (/^ghp_/.test(v)) return ' This is a classic PAT (ghp_): classic tokens can reach every repo you can; prefer a fine-grained token with an expiry.';
+  if (/^gho_/.test(v)) return ' OAuth token (gho_): it stays valid until revoked or unused for a year.';
+  if (/^npm_/.test(v)) return ' Check at npmjs.com → Access Tokens whether it is a granular token with an expiry and 2FA bypass off.';
+  if (/^(AKIA)/.test(v)) return ' Long-lived IAM user key (AKIA); temporary credentials (ASIA, via SSO/STS) expire on their own.';
+  return '';
+}
+
 export function scanGitHub(ctx) {
   const out = [];
   const hosts = [join(ctx.home, '.config', 'gh', 'hosts.yml'), join(ctx.home, 'AppData', 'Roaming', 'GitHub CLI', 'hosts.yml')];
@@ -90,7 +99,7 @@ export function scanGitHub(ctx) {
         title: 'GitHub CLI token stored in plaintext',
         location: tilde(ctx, f),
         fingerprint: fingerprint(m[1]),
-        detail: 'gh fell back to a plaintext file (no OS keyring). Install scripts can read it and push to every repo you can write to.',
+        detail: 'gh fell back to a plaintext file (no OS keyring). Install scripts can read it and push to every repo you can write to.' + tokenHint(m[1]),
       });
     }
   }
@@ -107,7 +116,7 @@ export function scanGitHub(ctx) {
         title: `Plaintext git credential for ${m[3]}`,
         location: tilde(ctx, gitCreds),
         fingerprint: fingerprint(m[2]),
-        detail: 'git credential.helper=store keeps passwords/tokens unencrypted. Switch to the OS credential manager.',
+        detail: 'git credential.helper=store keeps passwords/tokens unencrypted. Switch to the OS credential manager.' + tokenHint(decodeURIComponent(m[2])),
       });
     }
   }
@@ -236,6 +245,16 @@ function mcpServersFrom(obj, path = []) {
   return found;
 }
 
+export function unpinnedNpx(server) {
+  if (typeof server?.command !== 'string' || !/(^|[\\/])(npx|bunx|pnpx)(\.cmd|\.exe)?$/i.test(server.command)) return null;
+  const args = (server.args || []).filter((a) => typeof a === 'string');
+  const pkg = args.find((a) => !a.startsWith('-'));
+  if (!pkg || /^[./]/.test(pkg)) return null;
+  const at = pkg.lastIndexOf('@');
+  const hasVersion = at > 0 && /^\d/.test(pkg.slice(at + 1));
+  return hasVersion ? null : pkg;
+}
+
 function literalSecretsInServer(server) {
   const hits = [];
   for (const bag of ['env', 'headers', 'http_headers']) {
@@ -288,6 +307,9 @@ export function scanAiConfigs(ctx) {
     let json;
     try { json = JSON.parse(text); } catch { continue; }
     for (const { name, server } of mcpServersFrom(json)) {
+      const pkg = unpinnedNpx(server);
+      if (pkg) out.push({ id: 'ai.mcp-unpinned', category: 'ai', severity: 'low', title: `MCP server "${name}" runs an unpinned package (${pkg})`, location: tilde(ctx, f),
+        detail: '`npx -y <pkg>` fetches whatever version is latest every time the agent starts, with your agent\'s environment. Pin an exact version (pkg@1.2.3) so a hijacked release is not pulled in automatically.' });
       for (const hit of literalSecretsInServer(server)) {
         out.push({
           id: 'ai.mcp-literal-secret', category: 'ai', severity: 'high',
@@ -377,7 +399,7 @@ export function scanDotenv(ctx) {
   for (const root of ctx.projects) {
     for (const f of walk(root, { maxDepth: ctx.depth, skip: SKIP_DIRS })) {
       const base = f.split(/[\\/]/).pop();
-      if (!/^\.env(\..+)?$/.test(base) || /\.(example|sample|template|dist|defaults|demo)$/i.test(base)) continue;
+      if (!/^\.env(\..+)?$/.test(base) || /\.(example|sample|template|dist|defaults|demo|emulated|emulator|mock)$/i.test(base)) continue;
       const text = readText(f);
       if (!text) continue;
       const secrets = parseDotenv(text).filter(([k, v]) => isSecretPair(k, v));
@@ -409,11 +431,20 @@ export function scanHardening(ctx) {
     });
   }
   const pnpmWs = ctx.projects.map((p) => readText(join(p, 'pnpm-workspace.yaml'))).filter(Boolean).join('\n');
-  if (!/min-release-age|minimum-release-age/.test(npmrcs) && !/minimumReleaseAge/.test(pnpmWs)) {
+  const yarnrc = [join(ctx.home, '.yarnrc.yml'), ...ctx.projects.map((p) => join(p, '.yarnrc.yml'))].map(readText).filter(Boolean).join('\n');
+  const bunfig = [join(ctx.home, '.bunfig.toml'), ...ctx.projects.map((p) => join(p, 'bunfig.toml'))].map(readText).filter(Boolean).join('\n');
+  const configured = /^\s*min-release-age\s*=/m.test(npmrcs) || /minimumReleaseAge\s*:/.test(pnpmWs) || /npmMinimalAgeGate\s*:/.test(yarnrc) || /^\s*minimumReleaseAge\s*=/m.test(bunfig);
+  if (!configured) {
+    const has = (f) => ctx.projects.some((p) => exists(join(p, f)));
+    const tips = [];
+    if (has('package-lock.json') || !(has('pnpm-lock.yaml') || has('yarn.lock') || has('bun.lock'))) tips.push('npm ≥ 11.10: `min-release-age=3` in .npmrc (days)');
+    if (has('pnpm-lock.yaml')) tips.push('pnpm ≥ 10.16: `minimumReleaseAge: 4320` in pnpm-workspace.yaml (minutes; pnpm 11 defaults to 1440)');
+    if (has('yarn.lock')) tips.push('Yarn Berry: `npmMinimalAgeGate: 4320` in .yarnrc.yml (minutes)');
+    if (has('bun.lock')) tips.push('Bun ≥ 1.3: `[install] minimumReleaseAge = 259200` in bunfig.toml (seconds)');
     out.push({
       id: 'hardening.release-age', category: 'hardening', severity: 'low',
-      title: 'No dependency cooldown configured', location: '.npmrc',
-      detail: 'Malicious versions are usually pulled within hours. `min-release-age=3` (npm ≥ 11.10, days) or `minimumReleaseAge: 4320` (pnpm, minutes) keeps you out of that window.',
+      title: 'No dependency cooldown configured', location: 'package manager config',
+      detail: `Malicious versions are usually pulled within hours. ${tips.join('; ')}. A cooldown would not have caught a compromise that went unnoticed for longer.`,
     });
   }
   return out;

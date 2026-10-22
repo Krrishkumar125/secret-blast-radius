@@ -72,6 +72,7 @@ const SECRET_NAME = /(^|_|-)(api[-_]?key|apikey|token|secret|password|passwd|pwd
 const NOT_SECRET_NAME = /(^|_)(public|publishable|anon|pk|next_public|vite|expo_public|token_url|auth_url|auth_domain|endpoint|region|ttl|expir[a-z]*|length|limit|max|timeout|path|file|enabled|disable|issuer|audience)(_|$)/i;
 
 export function looksLikeSecretName(name) {
+  if (/^(OLD)?PWD$/i.test(name)) return false; // shell's working directory, not a password
   return SECRET_NAME.test(name) && !NOT_SECRET_NAME.test(name);
 }
 

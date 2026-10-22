@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
 import { writeFileSync, readFileSync } from 'node:fs';
-import { scan, failsAt, formatText, formatMarkdown, runbook, toSarif, INCIDENTS } from '../src/index.js';
+import { scanAsync, failsAt, formatText, formatMarkdown, runbook, toSarif, INCIDENTS } from '../src/index.js';
 
 const HELP = `Usage: secret-blast-radius [options] [project-dir...]
 
@@ -11,16 +11,21 @@ Read-only. Never prints secret values.
 
 Options:
   --incident <name>    Tailored checklist + only the relevant checks. Names:
-                       php2shell, railway, tensorlake, shai-hulud, subql, ghostaction, emudhra, sbi
+                       php2shell, glassworm, railway, tensorlake, shai-hulud, subql, ghostaction, emudhra, sbi
   --list-incidents     Show incident names and status
   --json               Machine-readable output
   --sarif [file]       SARIF 2.1.0 for GitHub code scanning (stdout, or --sarif-file <f>)
   --ioc-file <f>       Extra IOC JSON (same shape as src/iocs.json); repeatable
-  --no-exec            Never run helper commands (php -r, crontab -l, ps)
+  --no-exec            Never run helper commands (php -v, crontab -l, ps, git)
+  --history            Exposure window: walk lockfile git history for known-bad versions (runs git)
+  --since <date>       Limit --history to commits since a date (e.g. 2026-09-01)
+  --osv                ONLINE, opt-in: send lockfile package names+versions (nothing else) to
+                       api.osv.dev and report MAL- malicious-package advisories
   --runbook [file]     Print (or write to file) a Markdown rotation runbook
   --fail-on <level>    Exit 1 if any finding is at/above level: critical|high|medium|low|none (default: none)
   --only <list>        Comma list of scanners: persistence,npm,github,cloud,kubernetes,env,ai,ssh,dotenv,
-                       hardening,malicious,repo,host-persistence,php,paas,certs,install-scripts
+                       hardening,malicious,repo,host-persistence,php,paas,certs,install-scripts,
+                       ecosystems,extensions,npm-cache,history
   --skip <list>        Comma list of scanners to skip
   --no-env             Do not inspect environment variables
   --depth <n>          How deep to look for .env files in project dirs (default 4)
@@ -36,7 +41,7 @@ try {
     allowPositionals: true,
     options: {
       json: { type: 'boolean' }, sarif: { type: 'boolean' }, 'sarif-file': { type: 'string' },
-      incident: { type: 'string' }, 'list-incidents': { type: 'boolean' }, 'ioc-file': { type: 'string', multiple: true }, 'no-exec': { type: 'boolean' }, runbook: { type: 'boolean' }, 'runbook-file': { type: 'string' },
+      incident: { type: 'string' }, 'list-incidents': { type: 'boolean' }, 'ioc-file': { type: 'string', multiple: true }, 'no-exec': { type: 'boolean' }, history: { type: 'boolean' }, since: { type: 'string' }, osv: { type: 'boolean' }, runbook: { type: 'boolean' }, 'runbook-file': { type: 'string' },
       'fail-on': { type: 'string', default: 'none' }, only: { type: 'string' }, skip: { type: 'string' },
       'no-env': { type: 'boolean' }, depth: { type: 'string' }, home: { type: 'string' },
       'no-color': { type: 'boolean' }, version: { type: 'boolean', short: 'v' }, help: { type: 'boolean', short: 'h' },
@@ -67,7 +72,8 @@ if (o['no-env']) skip.push('env');
 
 let result;
 try {
-  result = scan({ projects, home: o.home, only: list(o.only), skip, depth: o.depth ? Number(o.depth) : undefined, incident: o.incident, iocFiles: o['ioc-file'] ?? [], exec: o['no-exec'] ? false : undefined });
+  if (o.since && !/^\d{4}-\d{2}-\d{2}/.test(o.since)) throw new Error('--since expects a date like 2026-09-01');
+  result = await scanAsync({ osv: o.osv, history: o.history || o.since || list(o.only)?.includes('history') ? { since: o.since } : null, projects, home: o.home, only: list(o.only), skip, depth: o.depth ? Number(o.depth) : undefined, incident: o.incident, iocFiles: o['ioc-file'] ?? [], exec: o['no-exec'] ? false : undefined });
   failsAt(result, o['fail-on']);
 } catch (e) {
   console.error(`secret-blast-radius: ${e.message}`);

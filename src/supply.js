@@ -9,10 +9,11 @@ const rel = (root, p) => relative(root, p).replace(/\\/g, '/') || basename(p);
 const tilde = (ctx, p) => (p.startsWith(ctx.home) ? '~' + p.slice(ctx.home.length).replace(/\\/g, '/') : p);
 
 export function loadIocs(extraFiles = []) {
-  const merged = { updated: BUNDLED.updated, packages: [...BUNDLED.packages], markers: structuredClone(BUNDLED.markers) };
+  const merged = { updated: BUNDLED.updated, packages: [...BUNDLED.packages], extensions: [], markers: structuredClone(BUNDLED.markers) };
   for (const f of extraFiles) {
     const j = JSON.parse(readFileSync(f, 'utf8'));
     merged.packages.push(...(j.packages || []));
+    merged.extensions.push(...(j.extensions || []));
     for (const [k, v] of Object.entries(j.markers || {})) merged.markers[k] = [...new Set([...(merged.markers[k] || []), ...v])];
     if (j.updated && j.updated > merged.updated) merged.updated = j.updated;
   }

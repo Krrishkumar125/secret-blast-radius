@@ -32,7 +32,7 @@ test('cli: text report, json, runbook file and exit codes', (t) => {
   const rb = cli(['--runbook-file', out, '--runbook', ...base]);
   assert.equal(rb.status, 0, rb.stderr);
   const md = readFileSync(out, 'utf8');
-  assert.match(md, /## 1\. npm publish tokens/);
+  assert.match(md, /## 1\. Package registry tokens/);
   assert.ok(!md.includes(FAKE.npm));
 });
 
@@ -66,4 +66,14 @@ test('cli: --incident, --list-incidents, --sarif-file, --no-exec, bad incident',
   assert.ok(!readFileSync(out, 'utf8').includes(FAKE.stripe));
   const stdoutSarif = JSON.parse(cli(['--sarif', ...base]).stdout);
   assert.equal(stdoutSarif.version, '2.1.0');
+});
+
+test('cli: --history/--since/--osv flags parse and validate', () => {
+  const r = spawnSync(process.execPath, [CLI, '--since', 'yesterday', '--no-exec'], { encoding: 'utf8' });
+  assert.equal(r.status, 2);
+  assert.match(r.stderr, /--since expects a date/);
+  const ok = spawnSync(process.execPath, [CLI, '--history', '--since', '2026-09-01', '--only', 'history', '--json', '--no-exec'], { encoding: 'utf8' });
+  assert.equal(ok.status, 0, ok.stderr);
+  assert.deepEqual(JSON.parse(ok.stdout).findings, []);
+  assert.match(spawnSync(process.execPath, [CLI, '--help'], { encoding: 'utf8' }).stdout, /--osv +ONLINE, opt-in/);
 });

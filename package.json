@@ -1,6 +1,6 @@
 {
   "name": "secret-blast-radius",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "What would a malicious npm install steal from this machine or CI runner? Ranked inventory of reachable credentials, known-worm IOCs (Shai-Hulud, @subql, GhostAction), PHP2Shell and PaaS exposure checks, ordered rotation runbook, SARIF. Read-only, offline, never prints secrets.",
   "license": "MIT",
   "author": "Krrish Kumar (https://github.com/Krrishkumar125)",
@@ -26,7 +26,13 @@
     "php2shell",
     "ghostaction",
     "railway",
-    "github-action"
+    "github-action",
+    "vscode-extensions",
+    "glassworm",
+    "osv",
+    "rubygems",
+    "cargo",
+    "terraform"
   ],
   "type": "module",
   "bin": {
@@ -46,7 +52,7 @@
     "node": ">=18.18"
   },
   "scripts": {
-    "test": "node --test test/scanners.test.js test/supply.test.js test/cli.test.js",
+    "test": "node --test test/scanners.test.js test/supply.test.js test/cli.test.js test/v3.test.js",
     "check": "node --check bin/cli.js && npm test"
   }
 }

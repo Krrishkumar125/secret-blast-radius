@@ -1,0 +1,911 @@
+{
+ "updated": "2026-10-22",
+ "extensions": [
+  {
+   "id": "aadarkcode.one-dark-material",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "aligntool.extension-align-professional-tool",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "angular-studio.ng-angular-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "awesome-codebase.codebase-dart-pro",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "awesomeco.wonder-for-vscode-icons",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "bhbpbarn.vsce-python-indent-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "blockstoks.easily-gitignore-manage",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "brategmaqendaalar-studio.pro-prettyxml-formatter",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "codbroks.compile-runnner-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "codevunmis.csv-sql-tsv-rainbow",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "codwayexten.code-way-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "cosmic-themes.sql-formatter",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "craz2team.vscode-todo-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "crotoapp.vscode-xml-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "cudra-production.vsce-prettier-pro",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "daeumer-web.es-linter-for-vs-code",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "dark-code-studio.flutter-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "densy-little-studio.wonder-for-vscode-icons",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "dep-labs-studio.dep-proffesinal-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "dev-studio-sense.php-comp-tools-vscode",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "devmidu-studio.svg-better-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "dopbop-studio.vscode-tailwindcss-extension-toolkit",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "errlenscre.error-lens-finder-ex",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "exss-studio.yaml-professional-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "federicanc.dotenv-syntax-highlighting",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "flutxvs.vscode-kuberntes-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "gvotcha.claude-code-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "gvotcha.claude-code-extensions",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "intellipro.extension-json-intelligence",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "kharizma.vscode-extension-wakatime",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "ko-zu-gun-studio.synchronization-settings-vscode",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "kwitch-studio.auto-run-command-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "lavender-studio.theme-lavender-dreams",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "littensy-studio.magical-icons",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "lyu-wen-studio-web-han.better-formatter-vscode",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "markvalid.vscode-mdvalidator-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "mecreation-studio.pyrefly-pro-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "mswincx.antigravity-cockpit",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "mswincx.antigravity-cockpit-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "namopins.prettier-pro-vscode-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "oigotm.my-command-palette-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "otoboss.autoimport-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "ovixcode.vscode-better-comments",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "pessa07tm.my-js-ts-auto-commands",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "potstok.dotnet-runtime-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "pretty-studio-advisor.prettyxml-formatter",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "prismapp.prisma-vs-code-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "projmanager.your-project-manager-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "pubruncode.ccoderunner",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "pyflowpyr.py-flowpyright-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "pyscopexte.pyscope-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "redcapcollective.vscode-quarkus-elite-suite",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "rubyideext.ruby-ide-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "runnerpost.runner-your-code",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "shinypy.shiny-extension-for-vscode",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "sol-studio.solidity-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "ssgwysc.volar-vscode",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "studio-jjalaire-team.professional-quarto-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "studio-velte-distributor.pro-svelte-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "sun-shine-studio.shiny-extension-for-vscode",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "sxatvo.jinja-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "tamokill12.foundry-pdf-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "thing-mn.your-flow-extension-for-icons",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "tima-web-wang.shell-check-utils",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "tokcodes.import-cost-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "toowespace.worksets-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "treedotree.tree-do-todoextension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "tucyzirille-studio.angular-pro-tools-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "turbobase.sql-turbo-tool",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "twilkbilk.color-highlight-css",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "vce-brendan-studio-eich.js-debuger-vscode",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "yamaprolas.revature-labs-extension",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/open-vsx-transitive-glassworm-campaign"
+  },
+  {
+   "id": "outsidestormcommand.monochromator-theme",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "keyacrosslaud.auto-loop-for-antigravity",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "krundoven.ironplc-fast-hub",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "boulderzitunnel.vscode-buddies",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "cubedivervolt.html-code-validate",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "winnerdomain17.version-lens-tool",
+   "status": "malicious",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "peldravix.rpgiv2free-live-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "forkelbat.supersigil-rich-hub",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "fyltroven.gitchat-fast-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "syndakove.todo4vcode-quick-suite",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "vendrakos.rumdl-pro-kit",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "stadiumgripier.vscode-onedark-theme",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "wildlightregain.oxc-lint-format",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "haelthorn.fractal-fast-studio",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "gastholve.shell-pro-kit",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "tossbers.browser-open-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "pranlokev.topmodel-fast-suite",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "weldforick.brightscript-pro-kit",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "stelbavik.hledger-fast-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "brixmundo.eca-easy-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "shinypy.pycode-formatter",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "carveltstone.chatbuddy-auto-suite",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "thunderprosecutor.autopep8-formatter",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "spikearshock.csv-rainbow",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "countrepresent49.code-image-preview",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "lairinspectortrek70.todo-highlighter",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "superneentrance.peacock-colors",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "epichipporedeem.prettier-eslint-formatter",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "archchainturn.twinny-ai-assist",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "spacesalamanderhook.italian-language-pack",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "closedtierenchant.vscode-awesome-icons",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "emotionkyoseparate.turkish-language-pack",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "sremuven.beautify-super-lens",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "goltikov.auto-rich-forge",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "karnikov.better-rich-studio",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "trenarin.autodocstring-auto-studio",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "meldarin.biome-live-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "gronarin.auto-super-kit",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "keltarin.android-deep-hub",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "tralaven.c-easy-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "meltovik.bookmark-rich-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "seldovik.cmake-smart-pilot",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "veldekov.csv-pro-suite",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "brenaven.cursor-rich-helper",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "karnenko.cursorless-pro-pilot",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "faldenko.explorer-auto-hub",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "vornovin.ionic-easy-kit",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "tormekov.htmlmustache-fast-craft",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "dalsoven.intellij-live-pilot",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "krosarin.npm-fast-studio",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "meltuven.graphql-pro-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "veltarik.duplicate-fast-helper",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "tralarin.firefox-rich-lens",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "brixovik.es7-quick-hub",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "krosovik.laravel-quick-pilot",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "grisaven.markdown-live-kit",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "dranaven.flask-live-craft",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "drovenko.data-live-suite",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "krosaven.dot-live-forge",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "sremekov.javascriptsnippets-rich-craft",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "breluven.html-smart-suite",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "trikarin.database-super-tool",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "sremovik.dendron-deep-hub",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "dalsovik.dbclient-quick-suite",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "frelovin.gitpod-deep-helper",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "mrekelid.manpages-fast-kit",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "kuldaran.search-smart-forge",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "prednovik.php-super-pilot",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "tagovich.zener-pro-craft",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "grozdarov.jinjahtml-easy-studio",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "shiverov.open-smart-suite",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "draconzal.phpstan-easy-hub",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "marabenov.graphql-super-craft",
+   "status": "sleeper",
+   "campaign": "glassworm",
+   "ref": "https://socket.dev/blog/73-open-vsx-sleeper-extensions-glassworm"
+  },
+  {
+   "id": "oorzc.ssh-tools",
+   "versions": [
+    "0.5.1"
+   ],
+   "status": "malicious",
+   "campaign": "glassworm (publisher account compromise)",
+   "ref": "https://socket.dev/blog/glassworm-loader-hits-open-vsx-via-suspected-developer-account-compromise"
+  },
+  {
+   "id": "oorzc.i18n-tools-plus",
+   "versions": [
+    "1.6.8"
+   ],
+   "status": "malicious",
+   "campaign": "glassworm (publisher account compromise)",
+   "ref": "https://socket.dev/blog/glassworm-loader-hits-open-vsx-via-suspected-developer-account-compromise"
+  },
+  {
+   "id": "oorzc.mind-map",
+   "versions": [
+    "1.0.61"
+   ],
+   "status": "malicious",
+   "campaign": "glassworm (publisher account compromise)",
+   "ref": "https://socket.dev/blog/glassworm-loader-hits-open-vsx-via-suspected-developer-account-compromise"
+  },
+  {
+   "id": "oorzc.scss-to-css-compile",
+   "versions": [
+    "1.3.4"
+   ],
+   "status": "malicious",
+   "campaign": "glassworm (publisher account compromise)",
+   "ref": "https://socket.dev/blog/glassworm-loader-hits-open-vsx-via-suspected-developer-account-compromise"
+  }
+ ]
+}
