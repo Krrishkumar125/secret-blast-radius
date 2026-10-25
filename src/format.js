@@ -44,6 +44,9 @@ export function formatMarkdown(result) {
   const rb = runbook(result);
   if (!rb.length) return out.concat('Nothing to rotate: no reachable secrets were found.').join('\n');
   out.push('Work top to bottom. The order matters: stop persistence first, then the credentials a worm uses to spread (npm, GitHub), then everything else.', '');
+  if (rb.some((r) => r.category === 'github') && !rb.some((r) => r.category === 'persistence')) {
+    out.push('## 0. Before revoking any GitHub token', '', ...PRE_ROTATION.map((s) => `1. ${s}`), '');
+  }
   rb.forEach((step, i) => {
     out.push(`## ${i + 1}. ${step.label}`, '');
     for (const it of step.items) out.push(`- [ ] **${it.title}** — \`${it.location}\`${it.fingerprint ? ` (${it.fingerprint})` : ''}`);
@@ -54,3 +57,10 @@ export function formatMarkdown(result) {
   });
   return out.join('\n');
 }
+
+/** Step 0 when no persistence was found but GitHub tokens will be revoked (tensorlake GHSA-8g63-53c9-65j2). */
+export const PRE_ROTATION = [
+  'No worm persistence was found by this scan, but check anyway: gh-token-monitor wipes your home directory when the stolen GitHub token is revoked.',
+  'Linux: `systemctl --user list-units | grep -i gh-token-monitor`; macOS: `ls ~/Library/LaunchAgents | grep -i gh-token-monitor`; Windows: look for a gh-token-monitor scheduled task.',
+  'If it exists, remove it first (Linux: `systemctl --user disable --now gh-token-monitor.service`; macOS: `launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.user.gh-token-monitor.plist`), then rotate from a clean machine.',
+];

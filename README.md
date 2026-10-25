@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/v/secret-blast-radius)](https://www.npmjs.com/package/secret-blast-radius)
 [![downloads](https://img.shields.io/npm/dm/secret-blast-radius)](https://www.npmjs.com/package/secret-blast-radius)
 
-**One bad `npm install` can read every secret on your laptop. This tells you what it would get, whether it already happened, and what to rotate first.**
+**One bad `npm install` can read every secret on your laptop. This tells you what it would get, checks for known signs of compromise, and tells you what to rotate first.**
 
 ```bash
 npx secret-blast-radius
