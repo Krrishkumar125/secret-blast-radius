@@ -43,7 +43,7 @@
     "node": ">=18.18"
   },
   "scripts": {
-    "test": "node --test test/scanners.test.js test/supply.test.js test/cli.test.js test/v3.test.js test/v4.test.js test/package-metadata.test.js test/pre-rotation.test.js",
+    "test": "node --test test/scanners.test.js test/supply.test.js test/cli.test.js test/v3.test.js test/v4.test.js test/package-metadata.test.js test/pre-rotation.test.js test/v5.test.js",
     "check": "node --check bin/cli.js && npm test"
   }
 }

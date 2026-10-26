@@ -35,6 +35,8 @@ Rotation order if this machine is ever compromised: 1. persistence  2. npm  3. a
 
 *(Illustrative output: fingerprints and paths are examples.)*
 
+**New in 0.5:** `--html report.html` writes a self-contained, offline HTML report with the rotation plan at the top (no scripts, no external assets, values redacted). New `frontend` check: secrets in `NEXT_PUBLIC_`/`VITE_`/`REACT_APP_`/`EXPO_PUBLIC_` (and Nuxt, Gatsby, Vue CLI, SvelteKit/Astro `PUBLIC_`) variables, which frameworks inline into the browser bundle, and token-shaped secrets inside built JS in `dist`, `build`, `out`, `.next/static`, `public`.
+
 **New in 0.4:** `--harden` audits the settings that would have blunted this month's attacks and prints the exact fix: cooldowns, `--require-hashes`, uv `exclude-newer`, digest-pinned images, OIDC instead of long-lived publish/cloud keys, unpinned MCP servers, `.env` files with secrets committed to git. Also new: Python lockfiles and virtualenvs (requirements, poetry.lock, uv.lock, Pipfile.lock, pylock.toml), Docker image references, and `--incident litellm` / `--incident zeabur`.
 
 **New in 0.3:** `--history` shows the dates a bad version sat in your lockfile; GlassWorm editor-extension check; npm cache check; RubyGems/Cargo/Composer/Terraform/Pulumi credential files; opt-in `--osv` malicious-package lookup; a rotation plan with verify steps and provider docs.
@@ -66,6 +68,7 @@ Every advisory ends the same way: *"rotate everything the machine could access."
 | `ai` | MCP configs for Claude Code/Desktop, Cursor, Windsurf, VS Code, Zed, Kiro, Gemini; Claude, Gemini and Codex CLI logins |
 | `ssh` | Private keys without a passphrase (PEM, PKCS#8, OpenSSH) |
 | `dotenv` | `.env*` files in your projects (names only, never values) |
+| `frontend` | Secrets the browser gets: public-prefixed env vars (`NEXT_PUBLIC_`, `VITE_`, `REACT_APP_`, `EXPO_PUBLIC_`, `NUXT_PUBLIC_`, `GATSBY_`, `VUE_APP_`, `PUBLIC_`) holding a secret, and recognised tokens in built files (`dist`, `build`, `out`, `.next/static`, `.output/public`, `public`). Publishable keys (Stripe `pk_`, Firebase/Google `AIza`, Supabase anon, PostHog, Sentry DSN) are skipped |
 | `env` | Variables a CI step inherits (`NPM_TOKEN`, `AWS_*`, recognised token formats) |
 | `paas` | Railway, Vercel, Fly, Render, Netlify CLI tokens; Heroku in `~/.netrc`; which projects deploy where |
 | `ecosystems` | RubyGems `~/.gem/credentials`, Cargo `credentials.toml` (the plaintext `cargo:token` store), Composer `auth.json` (global and project), Terraform `credentials.tfrc.json`, Pulumi `credentials.json`, local `.tfstate` files |
@@ -120,7 +123,13 @@ Checks only fire on files you have. Settings that are already safe by default (p
 
 ## Rotation plan
 
-`--runbook` writes an ordered plan: stop the malware, then registry tokens (npm, PyPI, RubyGems, crates.io), GitHub, cloud and IaC, Kubernetes, deploy platforms, CI env, AI keys, SSH, app secrets. Each step has the exact commands, a **verify** check that the old credential is dead, a **redeploy** reminder where running processes keep old values, and links to the provider's own docs. One example of why the details matter: npm says token revocation can take up to an hour.
+`--runbook` writes an ordered plan: stop the malware, then registry tokens (npm, PyPI, RubyGems, crates.io), GitHub, cloud and IaC, Kubernetes, deploy platforms, secrets shipped to the browser, CI env, AI keys, SSH, app secrets. Each step has the exact commands, a **verify** check that the old credential is dead, a **redeploy** reminder where running processes keep old values, and links to the provider's own docs. One example of why the details matter: npm says token revocation can take up to an hour.
+
+```bash
+npx secret-blast-radius --html report.html
+```
+
+`--html` writes the same plan as a single offline HTML file you can open, print or attach to an incident ticket: rotation steps first, then every finding. It loads nothing (no scripts, fonts or CSS from the network; a Content-Security-Policy blocks them), every value that looks like a token is replaced by its fingerprint, and all paths and names are HTML-escaped.
 
 Trusted publishing and provenance tell you *where* a package was built. They don't tell you it's safe: `@subql/common@5.8.3` and `tensorlake@0.5.144` both had valid provenance.
 
@@ -169,7 +178,7 @@ It checks the repo only (worm IOCs, committed `.env` secrets, unsafe workflows) 
 
 ## Safety
 
-- **Read-only.** It only writes files you name (`--runbook-file`, `--sarif-file`).
+- **Read-only.** It only writes files you name (`--runbook-file`, `--sarif-file`, `--html`).
 - **Offline by default.** It makes no network requests unless you pass `--osv`, which sends package names and versions only. The IOC lists are bundled (`src/iocs.json`, `src/extension-iocs.json`, dated). Add your own with `--ioc-file extra.json` (`packages` and `extensions` keys).
 - **Secret values are never printed.** Findings show a location and a `sha256:xxxxxxxx` fingerprint. Every output format is tested for leaks.
 - **Zero dependencies.** Helper commands (`php -v`, `crontab -l`, `ps -eo args`, and `git log`/`git show` for `--history`) are run read-only with a timeout; `--no-exec` disables them.
@@ -182,6 +191,7 @@ It checks the repo only (worm IOCs, committed `.env` secrets, unsafe workflows) 
 | `--incident <name>`, `--list-incidents` | Incident checklists |
 | `--json`, `--sarif`, `--sarif-file <f>` | Machine output |
 | `--runbook`, `--runbook-file <f>` | Markdown rotation checklist |
+| `--html <f>` | Offline HTML report, rotation plan first |
 | `--fail-on <level>` | Exit 1 at/above `critical`, `high`, `medium`, `low` (default `none`) |
 | `--only` / `--skip <list>` | Choose scanners (names in the tables above) |
 | `--history`, `--since <date>` | Lockfile exposure window from git history |
@@ -212,6 +222,7 @@ secret-blast-radius answers one question: *what could have been stolen, and what
 - It checks well-known locations. It can't see your OS keychain (that's the point) or browser profiles.
 - The bundled IOC lists cover the incidents above, not every malicious package ever published. Use `--osv` for the full OpenSSF feed.
 - `--history` follows lockfiles that exist today; a lockfile that was deleted or renamed is not followed. On partial (`--filter=blob:none`) clones it fetches old blobs and is slow.
+- The `frontend` check finds recognised token formats in built files. A secret with no known prefix in a bundle is only caught through its `NEXT_PUBLIC_`/`VITE_`-style variable name in a `.env` file.
 - Sleeper extensions were benign when Socket found them. They're flagged as high risk, not proven malicious.
 - For distro PHP builds it can't tell whether your vendor backported the fix.
 - A clean report shrinks your blast radius. It doesn't prove a machine is clean.

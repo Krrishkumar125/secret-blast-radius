@@ -181,7 +181,7 @@ test('paas: project linked only through the Railway CLI config is detected', (t)
 });
 
 /* ---------- eMudhra certificates ---------- */
-function makeCert(dir, cn, issuerCn) {
+function makeCert(dir, cn) {
   // openssl is on GitHub runners for all OSes and on most dev machines; skip the test if it is missing.
   execFileSync('openssl', ['req', '-x509', '-newkey', 'ec', '-pkeyopt', 'ec_paramgen_curve:P-256', '-nodes', '-keyout', join(dir, 'k.pem'), '-out', join(dir, `${cn.replace(/\W/g, '')}.pem`), '-days', '2', '-subj', `/CN=${cn}`], { stdio: 'ignore' });
   return join(dir, `${cn.replace(/\W/g, '')}.pem`);

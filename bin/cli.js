@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from 'node:util';
 import { writeFileSync, readFileSync } from 'node:fs';
-import { scanAsync, failsAt, formatText, formatMarkdown, runbook, toSarif, INCIDENTS } from '../src/index.js';
+import { scanAsync, failsAt, formatText, formatMarkdown, formatHtml, runbook, toSarif, INCIDENTS } from '../src/index.js';
 
 const HELP = `Usage: secret-blast-radius [options] [project-dir...]
 
@@ -24,10 +24,11 @@ Options:
   --osv                ONLINE, opt-in: send lockfile package names+versions (nothing else) to
                        api.osv.dev and report MAL- malicious-package advisories
   --runbook [file]     Print (or write to file) a Markdown rotation runbook
+  --html <file>        Write a self-contained offline HTML report (rotation plan first, values redacted)
   --fail-on <level>    Exit 1 if any finding is at/above level: critical|high|medium|low|none (default: none)
   --only <list>        Comma list of scanners: persistence,npm,github,cloud,kubernetes,env,ai,ssh,dotenv,
                        hardening,malicious,repo,host-persistence,php,paas,certs,install-scripts,
-                       ecosystems,extensions,npm-cache,history,python,images,harden
+                       ecosystems,extensions,npm-cache,history,python,images,harden,frontend
   --skip <list>        Comma list of scanners to skip
   --no-env             Do not inspect environment variables
   --depth <n>          How deep to look for .env files in project dirs (default 4)
@@ -43,7 +44,7 @@ try {
     allowPositionals: true,
     options: {
       json: { type: 'boolean' }, sarif: { type: 'boolean' }, 'sarif-file': { type: 'string' },
-      incident: { type: 'string' }, 'list-incidents': { type: 'boolean' }, 'ioc-file': { type: 'string', multiple: true }, 'no-exec': { type: 'boolean' }, history: { type: 'boolean' }, harden: { type: 'boolean' }, since: { type: 'string' }, osv: { type: 'boolean' }, runbook: { type: 'boolean' }, 'runbook-file': { type: 'string' },
+      incident: { type: 'string' }, 'list-incidents': { type: 'boolean' }, 'ioc-file': { type: 'string', multiple: true }, 'no-exec': { type: 'boolean' }, history: { type: 'boolean' }, harden: { type: 'boolean' }, since: { type: 'string' }, osv: { type: 'boolean' }, runbook: { type: 'boolean' }, 'runbook-file': { type: 'string' }, html: { type: 'string' },
       'fail-on': { type: 'string', default: 'none' }, only: { type: 'string' }, skip: { type: 'string' },
       'no-env': { type: 'boolean' }, depth: { type: 'string' }, home: { type: 'string' },
       'no-color': { type: 'boolean' }, version: { type: 'boolean', short: 'v' }, help: { type: 'boolean', short: 'h' },
@@ -86,6 +87,10 @@ const version = JSON.parse(readFileSync(new URL('../package.json', import.meta.u
 if (o.sarif || o['sarif-file']) {
   const sarif = JSON.stringify(toSarif(result, version), null, 2) + '\n';
   if (o['sarif-file']) { writeFileSync(o['sarif-file'], sarif); if (!o.json) console.error(`SARIF written to ${o['sarif-file']}`); } else process.stdout.write(sarif);
+}
+if (o.html) {
+  writeFileSync(o.html, formatHtml(result, { version }));
+  console.error(`HTML report written to ${o.html}`);
 }
 if (o.sarif && !o['sarif-file']) {
   // stdout already used for SARIF

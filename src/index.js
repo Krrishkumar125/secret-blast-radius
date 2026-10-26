@@ -6,8 +6,9 @@ import { SUPPLY_SCANNERS, loadIocs } from './supply.js';
 import { INCIDENTS } from './incidents.js';
 import { V3_SCANNERS, osvMalicious } from './v3.js';
 import { V4_SCANNERS } from './v4.js';
+import { FRONTEND_SCANNERS } from './frontend.js';
 
-export const ALL_SCANNERS = { ...SCANNERS, ...SUPPLY_SCANNERS, ...V3_SCANNERS, ...V4_SCANNERS };
+export const ALL_SCANNERS = { ...SCANNERS, ...SUPPLY_SCANNERS, ...V3_SCANNERS, ...V4_SCANNERS, ...FRONTEND_SCANNERS };
 
 function defaultExec(cmd, args) {
   try {
@@ -84,38 +85,49 @@ export const ROTATION = {
     verify: ['The old DB password / API key is rejected by its provider; the redeployed service is healthy.'],
     docs: [['Railway security disclosure (Oct 21, 2026)', 'https://blog.railway.com/p/security-disclosure-wednesday-october-21st']],
   },
+  frontend: {
+    order: 6, label: 'Secrets shipped to the browser (public env vars, built JS)', redeploy: true,
+    steps: [
+      'Treat the key as public already: rotate it at the provider first. Every deployed build, preview deployment and CDN copy still contains the old value.',
+      'Remove the public prefix (NEXT_PUBLIC_, VITE_, REACT_APP_, EXPO_PUBLIC_, ...) and use the secret only in server code: an API route, server action or edge function that the browser calls.',
+      'Rebuild and redeploy, then delete old deployments/previews and purge CDN caches. For mobile (Expo), the old key stays in every installed app version.',
+      'Where a provider has a browser-safe key (Stripe publishable, Supabase anon with RLS, referrer-restricted Google keys), use that instead.',
+    ],
+    verify: ['A fresh build contains no secret: re-run `npx secret-blast-radius --only frontend`; the old key is rejected by its provider.'],
+    docs: [['Next.js: environment variables (NEXT_PUBLIC_)', 'https://nextjs.org/docs/app/guides/environment-variables'], ['Vite: env variables and modes', 'https://vite.dev/guide/env-and-mode'], ['Expo: environment variables', 'https://docs.expo.dev/guides/environment-variables/'], ['Create React App: custom environment variables', 'https://create-react-app.dev/docs/adding-custom-environment-variables/']],
+  },
   env: {
-    order: 6, label: 'Secrets present in the environment / CI', redeploy: true,
+    order: 7, label: 'Secrets present in the environment / CI', redeploy: true,
     steps: ['Rotate each listed variable at its provider and update the CI secret store.', 'In CI, pass secrets only to the steps that need them, never to `npm install`.'],
     verify: ['Re-run this tool in CI: the variable no longer appears in the install step.'],
     docs: [['GitHub Actions: using secrets', 'https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions']],
   },
   ai: {
-    order: 7, label: 'AI provider keys and MCP servers',
+    order: 8, label: 'AI provider keys and MCP servers',
     steps: ['Revoke and reissue the keys in each provider console (OpenAI, Anthropic, etc.).', 'Replace literal values in MCP configs with "${ENV_VAR}" references; pin MCP server package versions instead of `npx -y <pkg>`.'],
     verify: ['A request with the old key returns 401.'],
     docs: [['Trail of Bits: insecure credential storage in MCP', 'https://blog.trailofbits.com/2025/04/30/insecure-credential-storage-plagues-mcp/']],
   },
   ssh: {
-    order: 8, label: 'SSH keys',
+    order: 9, label: 'SSH keys',
     steps: ['Generate a new key (`ssh-keygen -t ed25519`) with a passphrase.', 'Replace the public key on GitHub/GitLab and in every server\'s authorized_keys; remove the old one.'],
     verify: ['`ssh -i <old key> git@github.com` is denied.'],
     docs: [['GitHub: generating a new SSH key', 'https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent']],
   },
   dotenv: {
-    order: 9, label: 'Application secrets in .env files', redeploy: true,
+    order: 10, label: 'Application secrets in .env files', redeploy: true,
     steps: ['Rotate database passwords, payment keys and webhook secrets at each provider.', 'Redeploy: most platforms only read env vars at process start.'],
     verify: ['The old value is rejected by its provider.'],
     docs: [['The Twelve-Factor App: config', 'https://12factor.net/config']],
   },
   php: {
-    order: 10, label: 'Patch PHP (PHP2Shell)', redeploy: true,
+    order: 11, label: 'Patch PHP (PHP2Shell)', redeploy: true,
     steps: ['Update to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 or later; PHP ≤ 8.1 must be upgraded.', 'Rebuild images with --pull --no-cache and restart all PHP workers.'],
     verify: ['`php -v` in each running container shows a fixed version.'],
     docs: [['CISA alert (Oct 21, 2026)', 'https://www.cisa.gov/news-events/alerts/2026/10/21/critical-vulnerabilities-php-require-immediate-patching']],
   },
   certs: {
-    order: 11, label: 'Replace certificates under emSign ECC Root CA - G3',
+    order: 12, label: 'Replace certificates under emSign ECC Root CA - G3',
     steps: ['Issue a replacement certificate from another CA before Oct 27, 2026.', 'Remove the root from custom trust bundles.'],
     verify: ['`openssl s_client -connect host:443` shows the new issuer.'],
     docs: [['Google: compromised eMudhra intermediates', 'https://blog.google/security/protecting-chrome-and-android-users-from-compromised-emudhra-intermediate-ca-certificates/']],
@@ -184,5 +196,7 @@ export function failsAt(result, level) {
 
 export { formatText, formatMarkdown } from './format.js';
 export { toSarif } from './sarif.js';
+export { formatHtml, redact, escapeHtml } from './html.js';
+export { scanFrontend, findTokensInText } from './frontend.js';
 export { INCIDENTS } from './incidents.js';
 export { loadIocs, parseLockfile, phpStatus } from './supply.js';

@@ -1,7 +1,7 @@
 import { join, relative } from 'node:path';
 import {
   fingerprint, readText, readBytes, listDir, exists, mtime,
-  isReference, looksLikeSecretName, isSecretPair, tokenKind, walk,
+  isReference, isSecretPair, tokenKind, walk,
 } from './util.js';
 
 const days = (d) => (d ? Math.floor((Date.now() - d.getTime()) / 86400000) : null);

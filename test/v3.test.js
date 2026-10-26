@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { fixture, FAKE } from './helpers.js';
-import { scan, scanAsync, formatText, formatMarkdown, toSarif, runbook, ROTATION, loadIocs } from '../src/index.js';
+import { scan, scanAsync, formatText, formatMarkdown, toSarif, ROTATION, loadIocs } from '../src/index.js';
 import { scanEcosystems, scanExtensions, scanNpmCache, scanHistory, collectPackages } from '../src/v3.js';
 import { unpinnedNpx, tokenHint } from '../src/scanners.js';
 

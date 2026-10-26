@@ -1,4 +1,4 @@
-import { join, relative, dirname, basename } from 'node:path';
+import { join, relative, basename } from 'node:path';
 import { X509Certificate, createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { readText, listDir, exists, walk, isReference } from './util.js';
