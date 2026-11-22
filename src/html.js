@@ -57,7 +57,7 @@ export function formatHtml(result, { version = '' } = {}) {
     // No scripts, no network: inline styles only.
     `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">`,
     '<meta name="referrer" content="no-referrer">', '<meta name="viewport" content="width=device-width, initial-scale=1">',
-    `<title>secret-blast-radius report${result.incident ? ` – ${t(result.incident)}` : ''}</title>`, `<style>${CSS}</style>`, '</head>', '<body>');
+    `<title>secret-blast-radius report${result.incident ? `: ${t(result.incident)}` : ''}</title>`, `<style>${CSS}</style>`, '</head>', '<body>');
   out.push('<header>', `<h1>${result.harden ? 'Hardening report' : 'Rotation plan'}</h1>`,
     `<p class="mut">secret-blast-radius${version ? ` ${t(version)}` : ''} · generated ${t(result.scannedAt)}${result.projects?.length ? ` · projects: ${result.projects.map((p) => `<code>${t(p)}</code>`).join(', ')}` : ''}</p>`,
     `<p>Secret values are never included. Each item shows where it was found and a <code>sha256:xxxxxxxx</code> fingerprint so you can tell them apart.</p>`,
@@ -82,7 +82,7 @@ export function formatHtml(result, { version = '' } = {}) {
     }
     rb.forEach((step, i) => {
       out.push(`<li class="step"><h3>${i + 1}. ${t(step.label)}</h3>`);
-      out.push(`<ul class="items">${step.items.map((it) => `<li><span class="tag ${escapeHtml(it.severity)}">${escapeHtml(it.severity)}</span><strong>${t(it.title)}</strong> — <code>${t(it.location)}</code>${it.fingerprint ? ` <span class="mut">${t(it.fingerprint)}</span>` : ''}</li>`).join('')}</ul>`);
+      out.push(`<ul class="items">${step.items.map((it) => `<li><span class="tag ${escapeHtml(it.severity)}">${escapeHtml(it.severity)}</span><strong>${t(it.title)}</strong>: <code>${t(it.location)}</code>${it.fingerprint ? ` <span class="mut">${t(it.fingerprint)}</span>` : ''}</li>`).join('')}</ul>`);
       out.push(`<ol>${step.steps.map((s) => `<li>${md(s)}</li>`).join('')}</ol>`);
       if (step.verify?.length) out.push(`<p><strong>Verify the old credential is dead:</strong></p><ul>${step.verify.map((v) => `<li>${md(v)}</li>`).join('')}</ul>`);
       if (step.redeploy) out.push('<p><strong>Redeploy</strong> after updating: running processes keep the old value until restart.</p>');

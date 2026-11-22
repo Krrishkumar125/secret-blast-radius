@@ -16,7 +16,7 @@ const noLeak = (result, values) => {
 const gemKey = 'rubygems_' + 'a1'.repeat(24);
 const cargoTok = 'cio' + 'Z9'.repeat(16);
 
-test('ecosystems: RubyGems, Cargo, Composer, Terraform, Pulumi, tfstate — and never leaks', (t) => {
+test('ecosystems: RubyGems, Cargo, Composer, Terraform, Pulumi, tfstate, and never leaks', (t) => {
   const { root, cleanup } = fixture({
     '.gem/credentials': `---\n:rubygems_api_key: ${gemKey}\n`,
     '.cargo/credentials.toml': `[registry]\ntoken = "${cargoTok}"\n`,

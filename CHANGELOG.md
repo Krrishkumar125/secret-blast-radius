@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1 (2026-11-22)
+
+- Text output, the Markdown runbook, the HTML report, incident titles and details, and the README no longer use em or en dashes. Titles use a colon and date ranges use "to".
+- Test: a new check fails if an em or en dash appears in incident data, source files, the README or any report format.
+
 ## 0.5.0 (2026-10-26)
 
 - `--html <file>`: self-contained offline HTML report. The rotation plan is the top section, then every finding. No scripts or external assets (a Content-Security-Policy blocks them), token-shaped values are replaced by `[redacted sha256:…]`, URL passwords by `***`, and all dynamic text is HTML-escaped.

@@ -411,7 +411,7 @@ export function scanDotenv(ctx) {
         title: `${secrets.length} secret(s) in ${relative(root, f).replace(/\\/g, '/') || base}`,
         location: tilde(ctx, f),
         names: secrets.map(([k]) => k),
-        detail: `Keys: ${secrets.map(([k]) => k).join(', ')}${kinds.length ? ` — recognised: ${kinds.join(', ')}` : ''}. ` +
+        detail: `Keys: ${secrets.map(([k]) => k).join(', ')}${kinds.length ? `; recognised: ${kinds.join(', ')}` : ''}. ` +
           'Install scripts run with your project as cwd, so .env files are the first thing they read.',
       });
     }

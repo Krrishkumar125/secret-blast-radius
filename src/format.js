@@ -8,7 +8,7 @@ export function formatText(result, { color = false } = {}) {
   const sev = { critical: (s) => c('1;31', s), high: (s) => c('31', s), medium: (s) => c('33', s), low: (s) => c('2', s) };
   const lines = [];
   const { counts } = result;
-  lines.push(c('1', 'secret-blast-radius') + (result.harden ? ' --harden: settings that would have blunted this month\'s attacks' : ' — what a malicious install script could steal from this machine right now'));
+  lines.push(c('1', 'secret-blast-radius') + (result.harden ? ' --harden: settings that would have blunted this month\'s attacks' : ': what a malicious install script could steal from this machine right now'));
   lines.push('');
   if (result.incident) {
     const inc = INCIDENTS[result.incident];
@@ -49,7 +49,7 @@ export function formatMarkdown(result) {
   }
   rb.forEach((step, i) => {
     out.push(`## ${i + 1}. ${step.label}`, '');
-    for (const it of step.items) out.push(`- [ ] **${it.title}** — \`${it.location}\`${it.fingerprint ? ` (${it.fingerprint})` : ''}`);
+    for (const it of step.items) out.push(`- [ ] **${it.title}**: \`${it.location}\`${it.fingerprint ? ` (${it.fingerprint})` : ''}`);
     out.push('', ...step.steps.map((s) => `1. ${s}`), '');
     if (step.verify?.length) out.push('**Verify the old credential is dead:**', '', ...step.verify.map((v) => `- ${v}`), '');
     if (step.redeploy) out.push('**Redeploy** after updating: running processes keep the old value until restart.', '');

@@ -1,7 +1,7 @@
 /** Incident playbooks. Every claim here is sourced; `status` marks what is confirmed vs still under investigation. */
 export const INCIDENTS = {
   php2shell: {
-    title: 'PHP2Shell — CVE-2026-109618 / CVE-2026-109619 (Oct 21, 2026)',
+    title: 'PHP2Shell: CVE-2026-109618 / CVE-2026-109619 (Oct 21, 2026)',
     status: 'Confirmed by the PHP project and CISA. CISA had not observed exploitation at publication; public PoCs were circulating.',
     scanners: ['php'],
     checklist: [
@@ -18,7 +18,7 @@ export const INCIDENTS = {
     status: 'Confirmed by LiteLLM ("contained, investigation in progress"). Root cause per vendor: GitHub CLI OAuth tokens leaked via logs of an internet-exposed internal LiteLLM deployment; how that deployment was accessed is not yet confirmed.',
     scanners: ['python', 'images', 'host-persistence', 'cloud', 'github', 'npm', 'ai', 'kubernetes', 'ssh', 'dotenv', 'env', 'ecosystems'],
     checklist: [
-      'Affected if you pip-installed litellm==1.107.0 (live 11:39–13:23 UTC Oct 21) or ran v1.107.0/latest/main-latest/main-stable images of ghcr.io/berriai/litellm{,-database,-non_root} or litellm/litellm between 11:46 and 14:20 UTC. Bad image index: sha256:1bbcb1443bc962e45f5aad53fe3d2c30600e0379715fb6c664cdd3ac126c339e.',
+      'Affected if you pip-installed litellm==1.107.0 (live 11:39 to 13:23 UTC Oct 21) or ran v1.107.0/latest/main-latest/main-stable images of ghcr.io/berriai/litellm{,-database,-non_root} or litellm/litellm between 11:46 and 14:20 UTC. Bad image index: sha256:1bbcb1443bc962e45f5aad53fe3d2c30600e0379715fb6c664cdd3ac126c339e.',
       'Do NOT start Python or pip in an affected environment first: cook.pth and sitecustomize.py run on every interpreter start.',
       'From a shell, delete cook.pth, cook.py, sitecustomize.py and matching __pycache__/*.pyc in every affected site-packages; kill the daemon holding /tmp/remote_code_loader.lock.',
       'Rebuild venvs and images from scratch pinned to litellm==1.106.2, images pinned by digest.',
@@ -30,7 +30,7 @@ export const INCIDENTS = {
     refs: ['https://docs.litellm.ai/blog/security-incident-oct-21-2026', 'https://github.com/BerriAI/litellm/issues/47826', 'https://socket.dev/blog/litellm-compromise', 'https://osv.dev/vulnerability/MAL-2026-2144'],
   },
   zeabur: {
-    title: 'Zeabur platform breach: env vars in the platform DB read (Oct 14–15, 2026)',
+    title: 'Zeabur platform breach: env vars in the platform DB read (Oct 14 to 15, 2026)',
     status: 'Confirmed by Zeabur (preliminary report). Zeabur has since announced it is shutting down.',
     scanners: ['dotenv', 'env', 'github'],
     checklist: [
@@ -42,7 +42,7 @@ export const INCIDENTS = {
     refs: ['https://zeabur.com/blogs/october-2026-security-incident', 'https://zeabur.com/blogs/zeabur-is-shutting-down'],
   },
   glassworm: {
-    title: 'GlassWorm — malicious and sleeper Open VSX / VS Code extensions (Mar–Oct 2026)',
+    title: 'GlassWorm: malicious and sleeper Open VSX / VS Code extensions (Mar to Oct 2026)',
     status: 'Confirmed by Socket research; extensions removed from Open VSX after reports. Sleeper extensions were benign when published and are flagged as high risk, not proven malicious.',
     scanners: ['extensions', 'persistence', 'host-persistence', 'github', 'npm'],
     checklist: [
@@ -66,11 +66,11 @@ export const INCIDENTS = {
     refs: ['https://blog.railway.com/p/security-disclosure-wednesday-october-21st'],
   },
   tensorlake: {
-    title: 'tensorlake@0.5.144 — Mini Shai-Hulud worm with gh-token-monitor dead-man\'s switch (Oct 8, 2026)',
+    title: 'tensorlake@0.5.144: Mini Shai-Hulud worm with gh-token-monitor dead-man\'s switch (Oct 8, 2026)',
     status: 'Confirmed by the maintainer (GHSA-8g63-53c9-65j2), Socket, StepSecurity and Aikido.',
     scanners: ['malicious', 'npm-cache', 'history', 'ecosystems', 'persistence', 'host-persistence', 'repo', 'npm', 'github', 'cloud', 'kubernetes', 'ssh', 'ai', 'dotenv', 'env'],
     checklist: [
-      'Search lockfiles and CI logs for tensorlake@0.5.144 and tensorlake-native-*@0.5.144 (live 01:12–02:54 UTC, Oct 8).',
+      'Search lockfiles and CI logs for tensorlake@0.5.144 and tensorlake-native-*@0.5.144 (live 01:12 to 02:54 UTC, Oct 8).',
       'If it ran: disconnect, then REMOVE gh-token-monitor before revoking any GitHub token (revocation triggers `rm -rf ~`).',
       'From a clean machine rotate npm, GitHub, cloud, Kubernetes, Vault, SSH/GPG, .env, AI-tool/MCP credentials.',
       'Check packages you publish for versions you did not release; check repos for commits by claude@users.noreply.github.com and the branch dependabot/github_actions/format/setup-formatter.',
@@ -79,7 +79,7 @@ export const INCIDENTS = {
     refs: ['https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2', 'https://www.stepsecurity.io/blog/tensorlake-npm-compromised-hostage-token-worm'],
   },
   subql: {
-    title: '@subql/common@5.8.3 — credential stealer + remote shell (Oct 5, 2026)',
+    title: '@subql/common@5.8.3: credential stealer + remote shell (Oct 5, 2026)',
     status: 'Confirmed: GHSA-9333-3c4x-x3h5 / MAL-2026-17571; analysed by StepSecurity and GMO Flatt Security.',
     scanners: ['malicious', 'npm-cache', 'history', 'ecosystems', 'host-persistence', 'cloud', 'github', 'npm', 'ssh', 'kubernetes', 'env', 'dotenv'],
     checklist: [
@@ -92,7 +92,7 @@ export const INCIDENTS = {
     refs: ['https://osv.dev/vulnerability/MAL-2026-17571', 'https://www.stepsecurity.io/blog/subql-ecosystem-compromised', 'https://flatt.tech/research/posts/subql-common-npm-supply-chain-attack/'],
   },
   ghostaction: {
-    title: 'GhostAction — malicious "security audit" workflows + VS Code fake-font stealer (Oct 7–15, 2026)',
+    title: 'GhostAction: malicious "security audit" workflows + VS Code fake-font stealer (Oct 7 to 15, 2026)',
     status: 'Confirmed by StepSecurity, Socket, GitGuardian and OpenSourceMalware. ~1,900 accounts, 30,000+ repos targeted.',
     scanners: ['repo', 'host-persistence', 'github', 'npm', 'cloud', 'kubernetes', 'ssh', 'ai', 'ecosystems'],
     checklist: [
@@ -105,7 +105,7 @@ export const INCIDENTS = {
     refs: ['https://thehackernews.com/2026/10/credential-stealing-github-actions.html', 'https://opensourcemalware.com/blog/ghostaction-copycats-polinrider-by-hiding-a-stealer-in-a-fake-font-file', 'https://blog.gitguardian.com/ghostaction-github-actions-supply-chain-attack-returns/'],
   },
   emudhra: {
-    title: 'eMudhra — weak keys in 8 intermediates under emSign ECC Root CA - G3 (reported Oct 17–18, 2026)',
+    title: 'eMudhra: weak keys in 8 intermediates under emSign ECC Root CA - G3 (reported Oct 17 to 18, 2026)',
     status: 'Confirmed by Google, Mozilla and eMudhra. eMudhra says no certificates were issued from the intermediates; root cause still under investigation.',
     scanners: ['certs'],
     checklist: [
@@ -117,7 +117,7 @@ export const INCIDENTS = {
     refs: ['https://blog.google/security/protecting-chrome-and-android-users-from-compromised-emudhra-intermediate-ca-certificates/', 'https://emudhra.com/en/post/certificate-security-incident/'],
   },
   sbi: {
-    title: 'SBI — customer records found on the dark web (disclosed Oct 21, 2026)',
+    title: 'SBI: customer records found on the dark web (disclosed Oct 21, 2026)',
     status: 'Under investigation. SBI\'s preliminary analysis of ~375,000 records found 3,897 customer records with PII; source not yet determined.',
     scanners: ['dotenv', 'env', 'ai'],
     checklist: [

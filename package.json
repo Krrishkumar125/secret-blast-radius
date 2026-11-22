@@ -1,6 +1,6 @@
 {
   "name": "secret-blast-radius",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Find which credentials a malicious npm install could steal, then get an ordered rotation plan. Read-only, offline.",
   "license": "MIT",
   "author": "Krrish Kumar (https://github.com/Krrishkumar125)",
@@ -43,7 +43,7 @@
     "node": ">=18.18"
   },
   "scripts": {
-    "test": "node --test test/scanners.test.js test/supply.test.js test/cli.test.js test/v3.test.js test/v4.test.js test/package-metadata.test.js test/pre-rotation.test.js test/v5.test.js",
+    "test": "node --test test/scanners.test.js test/supply.test.js test/cli.test.js test/v3.test.js test/v4.test.js test/package-metadata.test.js test/pre-rotation.test.js test/v5.test.js test/no-dashes.test.js",
     "check": "node --check bin/cli.js && npm test"
   }
 }

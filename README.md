@@ -48,7 +48,7 @@ The last few weeks, in order:
 | When (2026) | What | What it took |
 |---|---|---|
 | Oct 5 | [`@subql/common@5.8.3`](https://osv.dev/vulnerability/MAL-2026-17571) shipped through the project's own trusted-publishing workflow | AWS (SSM + Secrets Manager, all regions), GitHub, npm, SSH, K8s, Vault. Runs on import too, so `--ignore-scripts` isn't enough |
-| Oct 7–15 | [GhostAction](https://thehackernews.com/2026/10/credential-stealing-github-actions.html): ~1,900 hijacked GitHub accounts pushed "security audit" workflows to 30,000+ repos, then a [VS Code fake-font stealer](https://opensourcemalware.com/blog/ghostaction-copycats-polinrider-by-hiding-a-stealer-in-a-fake-font-file) | Actions secrets, everything in git history, `~/.npmrc`, `~/.aws`, `~/.netrc`, SSH keys, Claude/Gemini logins, plus a cron backdoor |
+| Oct 7 to 15 | [GhostAction](https://thehackernews.com/2026/10/credential-stealing-github-actions.html): ~1,900 hijacked GitHub accounts pushed "security audit" workflows to 30,000+ repos, then a [VS Code fake-font stealer](https://opensourcemalware.com/blog/ghostaction-copycats-polinrider-by-hiding-a-stealer-in-a-fake-font-file) | Actions secrets, everything in git history, `~/.npmrc`, `~/.aws`, `~/.netrc`, SSH keys, Claude/Gemini logins, plus a cron backdoor |
 | Oct 8 | [`tensorlake@0.5.144`](https://github.com/tensorlakeai/tensorlake/security/advisories/GHSA-8g63-53c9-65j2) (Mini Shai-Hulud) | Everything above plus AI-tool and MCP configs. Installs `gh-token-monitor`, which **wipes your home directory if you revoke the stolen GitHub token** |
 | Oct 21 | [Railway](https://blog.railway.com/p/security-disclosure-wednesday-october-21st): customer env vars may have been decrypted | Every secret you stored on the platform |
 | Oct 21 | [PHP2Shell](https://www.cisa.gov/news-events/alerts/2026/10/21/critical-vulnerabilities-php-require-immediate-patching) (CVE-2026-109618/-109619), unauthenticated RCE | Whatever your PHP servers can reach |
@@ -77,7 +77,7 @@ Every advisory ends the same way: *"rotate everything the machine could access."
 
 | Scanner | Detects |
 |---|---|
-| `malicious` | Known-bad versions in `package-lock.json`, `npm-shrinkwrap.json`, `pnpm-lock.yaml` (v5–v9), `yarn.lock` (classic + Berry), `bun.lock`, and in `node_modules`: tensorlake + native packages, `@subql/common@5.8.3`, `@7nohe/openapi-react-query-codegen` (10 versions), the keyv/cacheable wave; the `@opensearch/setup` worm marker |
+| `malicious` | Known-bad versions in `package-lock.json`, `npm-shrinkwrap.json`, `pnpm-lock.yaml` (v5 to v9), `yarn.lock` (classic + Berry), `bun.lock`, and in `node_modules`: tensorlake + native packages, `@subql/common@5.8.3`, `@7nohe/openapi-react-query-codegen` (10 versions), the keyv/cacheable wave; the `@opensearch/setup` worm marker |
 | `extensions` | Installed VS Code / Cursor / Windsurf / VSCodium / Kiro / remote-server extensions against 149 GlassWorm IOCs from Socket (malicious, version-scoped, and flagged sleepers), including ones pulled in through `extensionPack` |
 | `npm-cache` | Tarballs of known-bad versions in the npm cache index: proof the machine downloaded one even if no lockfile shows it today |
 | `history` (`--history`) | **Exposure window.** Walks each lockfile's git history and reports when a known-bad version entered and left (`2026-10-08 → 2026-10-10`), so you know which CI runs and machines to treat as exposed. `--since 2026-09-01` narrows it |
