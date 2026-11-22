@@ -326,6 +326,14 @@ export function scanPaas(ctx) {
     { p: [join(h, '.fly', 'config.yml')], name: 'Fly.io CLI', key: /access_token:\s*\S{8,}/, rotate: 'fly auth logout; revoke at fly.io/user/personal_access_tokens' },
     { p: [join(h, '.render', 'cli.yaml')], name: 'Render CLI', key: /(key|token):\s*\S{8,}/, rotate: 'render logout; revoke API keys in Account Settings' },
     { p: [join(h, '.config', 'netlify', 'config.json'), join(h, 'Library', 'Preferences', 'netlify', 'config.json')], name: 'Netlify CLI', key: /"token"\s*:\s*"[^"]{8,}"/, rotate: 'netlify logout; revoke at app.netlify.com/user/applications' },
+    // Cloudflare Wrangler v3+ keeps the OAuth grant in ~/.wrangler/config/default.toml
+    // (XDG variant ~/.config/.wrangler/...); older installs used api_token in ~/.wrangler/config.toml.
+    { p: [join(h, '.wrangler', 'config', 'default.toml'), join(h, '.config', '.wrangler', 'config', 'default.toml'), join(h, '.wrangler', 'config.toml')], name: 'Cloudflare Wrangler CLI', key: /(oauth_token|refresh_token|api_token)\s*=\s*"[^"]{8,}"/, rotate: 'wrangler logout; revoke the token under Cloudflare dashboard → My Profile → API Tokens' },
+    // huggingface-cli / hf store the token as a bare hf_... line (XDG cache first, legacy dir second).
+    { p: [join(h, '.cache', 'huggingface', 'token'), join(h, '.huggingface', 'token')], name: 'Hugging Face CLI', key: /hf_[A-Za-z0-9]{20,}/, rotate: 'huggingface-cli logout (hf auth logout); revoke at huggingface.co/settings/tokens' },
+    // stripe login writes the account's secret key into the CLI config (Go os.UserConfigDir:
+    // ~/.config/stripe on Linux/macOS, %APPDATA%\stripe on Windows).
+    { p: [join(h, '.config', 'stripe', 'config.toml'), join(h, 'AppData', 'Roaming', 'stripe', 'config.toml')], name: 'Stripe CLI', key: /sk_(live|test)_[A-Za-z0-9]{8,}/, rotate: 'revoke the key at dashboard.stripe.com/apikeys, then run stripe login again' },
   ];
   for (const c of cli) for (const p of c.p) {
     const t = readText(p);

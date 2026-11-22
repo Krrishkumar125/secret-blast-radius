@@ -70,7 +70,7 @@ Every advisory ends the same way: *"rotate everything the machine could access."
 | `dotenv` | `.env*` files in your projects (names only, never values) |
 | `frontend` | Secrets the browser gets: public-prefixed env vars (`NEXT_PUBLIC_`, `VITE_`, `REACT_APP_`, `EXPO_PUBLIC_`, `NUXT_PUBLIC_`, `GATSBY_`, `VUE_APP_`, `PUBLIC_`) holding a secret, and recognised tokens in built files (`dist`, `build`, `out`, `.next/static`, `.output/public`, `public`). Publishable keys (Stripe `pk_`, Firebase/Google `AIza`, Supabase anon, PostHog, Sentry DSN) are skipped |
 | `env` | Variables a CI step inherits (`NPM_TOKEN`, `AWS_*`, recognised token formats) |
-| `paas` | Railway, Vercel, Fly, Render, Netlify CLI tokens; Heroku in `~/.netrc`; which projects deploy where |
+| `paas` | Railway, Vercel, Fly, Render, Netlify, Cloudflare Wrangler, Hugging Face and Stripe CLI tokens; Heroku in `~/.netrc`; which projects deploy where |
 | `ecosystems` | RubyGems `~/.gem/credentials`, Cargo `credentials.toml` (the plaintext `cargo:token` store), Composer `auth.json` (global and project), Terraform `credentials.tfrc.json`, Pulumi `credentials.json`, local `.tfstate` files |
 
 **Signs you're already hit:**
