@@ -170,6 +170,105 @@ test('paas: CLI tokens, Railway project link, Heroku netrc; Procfile alone is no
   assert.ok(!JSON.stringify(r).includes('h'.repeat(36)) && !JSON.stringify(r).includes('rw_xxxx'));
 });
 
+test('paas: Cloudflare Wrangler CLI tokens (default.toml, XDG variant, legacy config.toml)', (t) => {
+  const oauth = 'ow_' + 'w'.repeat(40);
+  const api = 'a'.repeat(40);
+  const f = fixture({
+    'home/.wrangler/config/default.toml': `# wrangler v4 config\noauth_token = "${oauth}"\nrefresh_token = "r${'r'.repeat(30)}"\n`,
+    'home/.config/.wrangler/config/default.toml': '# XDG variant with a legacy API token\napi_token = "' + api + '"\n',
+    'home/.wrangler/config.toml': '# legacy v2 file, comment only\n# api_token = ""\n',
+    'home/proj/.keep': '',
+  });
+  t.after(f.cleanup);
+  const r = run(f.root, ['paas']);
+  const hits = r.findings.filter((x) => x.id === 'paas.cli-token');
+  assert.equal(hits.length, 2);
+  assert.ok(hits.every((x) => x.title === 'Cloudflare Wrangler CLI token stored in plaintext'));
+  assert.deepEqual(hits.map((x) => x.location).sort(), ['~/.config/.wrangler/config/default.toml', '~/.wrangler/config/default.toml']);
+  assert.ok(hits.every((x) => x.severity === 'high' && x.category === 'paas'));
+  assert.ok(hits.every((x) => /wrangler logout/.test(x.detail) && /API Tokens/.test(x.detail)));
+  const s = JSON.stringify(r);
+  assert.ok(!s.includes(oauth) && !s.includes(api) && !s.includes('r'.repeat(30)), 'secret leaked');
+});
+
+test('paas: Hugging Face CLI token (XDG cache and legacy dir), empty token file not flagged', (t) => {
+  const tok = 'hf_' + 'T'.repeat(34);
+  const f = fixture({
+    'home/.cache/huggingface/token': tok + '\n',
+    'home/.huggingface/token': '\n', // legacy path present but empty
+    'home/proj/.keep': '',
+  });
+  t.after(f.cleanup);
+  const r = run(f.root, ['paas']);
+  const hits = r.findings.filter((x) => x.id === 'paas.cli-token');
+  assert.equal(hits.length, 1);
+  assert.equal(hits[0].title, 'Hugging Face CLI token stored in plaintext');
+  assert.equal(hits[0].location, '~/.cache/huggingface/token');
+  assert.match(hits[0].detail, /huggingface-cli logout/);
+  assert.match(hits[0].detail, /huggingface\.co\/settings\/tokens/);
+  assert.ok(!JSON.stringify(r).includes(tok), 'secret leaked');
+
+  const g = fixture({ 'home/.huggingface/token': '# no token here\n', 'home/.cache/huggingface/token': '', 'home/proj/.keep': '' });
+  t.after(g.cleanup);
+  assert.equal(run(g.root, ['paas']).findings.filter((x) => x.id === 'paas.cli-token').length, 0);
+});
+
+test('paas: Stripe CLI secret key (Linux/macOS config and Windows %APPDATA% config), empty config not flagged', (t) => {
+  const live = 'sk_live_' + 'F'.repeat(24);
+  const test_key = 'sk_test_' + 'G'.repeat(24);
+  const f = fixture({
+    'home/.config/stripe/config.toml': '[default]\nsecret_key = "' + live + '"\n',
+    'home/proj/.keep': '',
+  });
+  t.after(f.cleanup);
+  const r = run(f.root, ['paas']);
+  const hits = r.findings.filter((x) => x.id === 'paas.cli-token');
+  assert.equal(hits.length, 1);
+  assert.equal(hits[0].title, 'Stripe CLI token stored in plaintext');
+  assert.equal(hits[0].location, '~/.config/stripe/config.toml');
+  assert.match(hits[0].detail, /dashboard\.stripe\.com\/apikeys/);
+  assert.ok(!JSON.stringify(r).includes(live), 'secret leaked');
+
+  // Windows-style path: %USERPROFILE%\AppData\Roaming\stripe\config.toml
+  const w = fixture({ 'home/AppData/Roaming/stripe/config.toml': 'secret_key = "' + test_key + '"\n', 'home/proj/.keep': '' });
+  t.after(w.cleanup);
+  const rw = run(w.root, ['paas']);
+  const whits = rw.findings.filter((x) => x.id === 'paas.cli-token');
+  assert.equal(whits.length, 1);
+  assert.match(whits[0].location, /AppData\/Roaming\/stripe\/config\.toml$/);
+  assert.ok(!JSON.stringify(rw).includes(test_key), 'secret leaked');
+
+  // Comment-only / empty stripe config is not a credential.
+  const g = fixture({ 'home/.config/stripe/config.toml': '# stripe config\n[default]\n# secret_key unset\n', 'home/proj/.keep': '' });
+  t.after(g.cleanup);
+  assert.equal(run(g.root, ['paas']).findings.filter((x) => x.id === 'paas.cli-token').length, 0);
+});
+
+test('paas: legacy ~/.wrangler/config.toml and ~/.huggingface/token positives; runbook text rotates but never leaks', (t) => {
+  const api = 'b'.repeat(40);
+  const tok = 'hf_' + 'U'.repeat(34);
+  const f = fixture({
+    'home/.wrangler/config.toml': 'api_token = "' + api + '"\n',
+    'home/.huggingface/token': tok,
+    'home/proj/.keep': '',
+  });
+  t.after(f.cleanup);
+  const r = run(f.root, ['paas']);
+  const hits = r.findings.filter((x) => x.id === 'paas.cli-token');
+  assert.deepEqual(hits.map((x) => x.location).sort(), ['~/.huggingface/token', '~/.wrangler/config.toml']);
+  assert.deepEqual(hits.map((x) => x.title).sort(), ['Cloudflare Wrangler CLI token stored in plaintext', 'Hugging Face CLI token stored in plaintext']);
+
+  // The rotation runbook / text report must name the rotate command, never the secret.
+  const txt = formatText(r);
+  assert.match(txt, /wrangler logout/);
+  assert.match(txt, /huggingface-cli logout/);
+  assert.ok(!txt.includes(api) && !txt.includes(tok), 'secret leaked into report');
+  const md = formatMarkdown(r);
+  assert.ok(!md.includes(api) && !md.includes(tok), 'secret leaked into markdown');
+  const sarif = JSON.stringify(toSarif(r));
+  assert.ok(!sarif.includes(api) && !sarif.includes(tok), 'secret leaked into sarif');
+});
+
 test('paas: project linked only through the Railway CLI config is detected', (t) => {
   const f = fixture({ 'proj/index.js': '', 'home/x': '' });
   t.after(f.cleanup);
