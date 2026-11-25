@@ -35,6 +35,8 @@ Rotation order if this machine is ever compromised: 1. persistence  2. npm  3. a
 
 *(Illustrative output: fingerprints and paths are examples.)*
 
+**New in 0.6:** a "Caches, mirrors and artifact stores" step in the rotation plan, right after registry tokens. Revoking a token does not clear the npm, pnpm or Yarn cache, a CI cache, a Verdaccio/Artifactory/Nexus/GitHub Packages mirror or an image layer, and any of them can keep serving a bad version or hold a working credential. A new `caches` check finds where that applies: a non-npmjs registry in `.npmrc`, `.yarnrc.yml` or `bunfig.toml`, credentials inside lockfile `resolved` URLs, Dockerfiles that pass an npm token as `ARG`/`ENV` or `COPY .npmrc`, and workflows that cache `~/.npm` or `node_modules`.
+
 **New in 0.5:** `--html report.html` writes a self-contained, offline HTML report with the rotation plan at the top (no scripts, no external assets, values redacted). New `frontend` check: secrets in `NEXT_PUBLIC_`/`VITE_`/`REACT_APP_`/`EXPO_PUBLIC_` (and Nuxt, Gatsby, Vue CLI, SvelteKit/Astro `PUBLIC_`) variables, which frameworks inline into the browser bundle, and token-shaped secrets inside built JS in `dist`, `build`, `out`, `.next/static`, `public`.
 
 **New in 0.4:** `--harden` audits the settings that would have blunted this month's attacks and prints the exact fix: cooldowns, `--require-hashes`, uv `exclude-newer`, digest-pinned images, OIDC instead of long-lived publish/cloud keys, unpinned MCP servers, `.env` files with secrets committed to git. Also new: Python lockfiles and virtualenvs (requirements, poetry.lock, uv.lock, Pipfile.lock, pylock.toml), Docker image references, and `--incident litellm` / `--incident zeabur`.
@@ -71,6 +73,7 @@ Every advisory ends the same way: *"rotate everything the machine could access."
 | `frontend` | Secrets the browser gets: public-prefixed env vars (`NEXT_PUBLIC_`, `VITE_`, `REACT_APP_`, `EXPO_PUBLIC_`, `NUXT_PUBLIC_`, `GATSBY_`, `VUE_APP_`, `PUBLIC_`) holding a secret, and recognised tokens in built files (`dist`, `build`, `out`, `.next/static`, `.output/public`, `public`). Publishable keys (Stripe `pk_`, Firebase/Google `AIza`, Supabase anon, PostHog, Sentry DSN) are skipped |
 | `env` | Variables a CI step inherits (`NPM_TOKEN`, `AWS_*`, recognised token formats) |
 | `paas` | Railway, Vercel, Fly, Render, Netlify CLI tokens; Heroku in `~/.netrc`; which projects deploy where |
+| `caches` | Places that outlive a rotation: private registries and mirrors in `.npmrc` / `.yarnrc.yml` / `bunfig.toml` (Verdaccio, Artifactory, Nexus, GitHub Packages, CodeArtifact recognised), credentials in lockfile `resolved` URLs, Dockerfile `ARG NPM_TOKEN` / `ENV` / `COPY .npmrc` instead of a BuildKit secret mount, GitHub Actions caches of `~/.npm`, pnpm/Yarn stores or `node_modules` |
 | `ecosystems` | RubyGems `~/.gem/credentials`, Cargo `credentials.toml` (the plaintext `cargo:token` store), Composer `auth.json` (global and project), Terraform `credentials.tfrc.json`, Pulumi `credentials.json`, local `.tfstate` files |
 
 **Signs you're already hit:**
@@ -123,7 +126,9 @@ Checks only fire on files you have. Settings that are already safe by default (p
 
 ## Rotation plan
 
-`--runbook` writes an ordered plan: stop the malware, then registry tokens (npm, PyPI, RubyGems, crates.io), GitHub, cloud and IaC, Kubernetes, deploy platforms, secrets shipped to the browser, CI env, AI keys, SSH, app secrets. Each step has the exact commands, a **verify** check that the old credential is dead, a **redeploy** reminder where running processes keep old values, and links to the provider's own docs. One example of why the details matter: npm says token revocation can take up to an hour.
+`--runbook` writes an ordered plan: stop the malware, then registry tokens (npm, PyPI, RubyGems, crates.io), caches, mirrors and artifact stores, GitHub, cloud and IaC, Kubernetes, deploy platforms, secrets shipped to the browser, CI env, AI keys, SSH, app secrets. Each step has the exact commands, a **verify** check that the old credential is dead, a **redeploy** reminder where running processes keep old values, and links to the provider's own docs. One example of why the details matter: npm says token revocation can take up to an hour.
+
+The caches step ends with a test you can run: revoke every token, clear the caches, rebuild from scratch. If the build still installs your private packages, something (a mirror, a cache, an image layer or a CI secret) still holds a working credential.
 
 ```bash
 npx secret-blast-radius --html report.html

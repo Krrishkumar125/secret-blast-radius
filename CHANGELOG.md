@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 (2026-11-26)
+
+- Rotation plan: new step "Caches, mirrors and artifact stores", right after registry tokens. It covers npm, pnpm, Yarn and Bun caches, CI caches (`gh cache delete --all`), rotating a private mirror's own tokens and upstream credentials and purging bad versions from it (Verdaccio, Artifactory, Nexus, GitHub Packages, CodeArtifact), and rebuilding images with `--pull --no-cache` and BuildKit secret mounts. Its verify check: revoke every token, clear the caches, rebuild; if private installs still work, something still holds a credential.
+- The step is added to the runbook whenever registry tokens or known-bad packages are found, not only when the new scanner finds something.
+- New `caches` scanner (read-only, offline): non-npmjs registries in `.npmrc`, `.yarnrc.yml` and `bunfig.toml`; credentials in lockfile `resolved` URLs (fingerprinted, never printed); Dockerfiles with `ARG`/`ENV` npm tokens or `COPY .npmrc`; GitHub Actions workflows that cache `~/.npm`, pnpm/Yarn/Bun stores or `node_modules`. Included in the tensorlake and subql incident checklists.
+- SARIF: findings that point at a line (`file:12`, used by the images and caches checks) now give code scanning a clean repo-relative path plus a `startLine` region. Before, the `:12` ended up inside the file path.
+- Rotation steps after the new one are renumbered by one. No new dependencies.
+
 ## 0.5.1 (2026-11-22)
 
 - Text output, the Markdown runbook, the HTML report, incident titles and details, and the README no longer use em or en dashes. Titles use a colon and date ranges use "to".
