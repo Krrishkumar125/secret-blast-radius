@@ -28,7 +28,7 @@ Options:
   --fail-on <level>    Exit 1 if any finding is at/above level: critical|high|medium|low|none (default: none)
   --only <list>        Comma list of scanners: persistence,npm,github,cloud,kubernetes,env,ai,ssh,dotenv,
                        hardening,malicious,repo,host-persistence,php,paas,certs,install-scripts,
-                       ecosystems,extensions,npm-cache,history,python,images,harden,frontend
+                       ecosystems,extensions,npm-cache,history,python,images,harden,frontend,caches
   --skip <list>        Comma list of scanners to skip
   --no-env             Do not inspect environment variables
   --depth <n>          How deep to look for .env files in project dirs (default 4)

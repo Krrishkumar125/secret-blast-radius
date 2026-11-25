@@ -158,7 +158,7 @@ test('persistence: gh-token-monitor puts "stop the worm" first in the runbook', 
   });
   t.after(f.cleanup);
   const r = run(f.root, ['persistence', 'npm', 'github', 'dotenv']);
-  assert.deepEqual(runbook(r).map((s) => s.category), ['persistence', 'npm', 'github', 'dotenv']);
+  assert.deepEqual(runbook(r).map((s) => s.category), ['persistence', 'npm', 'caches', 'github', 'dotenv']);
   const md = formatMarkdown(r);
   assert.ok(md.indexOf('BEFORE revoking') < md.indexOf('npm token delete'));
   assertNoLeak(md);

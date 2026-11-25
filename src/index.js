@@ -7,8 +7,9 @@ import { INCIDENTS } from './incidents.js';
 import { V3_SCANNERS, osvMalicious } from './v3.js';
 import { V4_SCANNERS } from './v4.js';
 import { FRONTEND_SCANNERS } from './frontend.js';
+import { CACHE_SCANNERS } from './caches.js';
 
-export const ALL_SCANNERS = { ...SCANNERS, ...SUPPLY_SCANNERS, ...V3_SCANNERS, ...V4_SCANNERS, ...FRONTEND_SCANNERS };
+export const ALL_SCANNERS = { ...SCANNERS, ...SUPPLY_SCANNERS, ...V3_SCANNERS, ...V4_SCANNERS, ...FRONTEND_SCANNERS, ...CACHE_SCANNERS };
 
 function defaultExec(cmd, args) {
   try {
@@ -50,10 +51,23 @@ export const ROTATION = {
     verify: ['`npm token list` no longer shows the old ID; `npm whoami` with the old token fails (allow up to an hour).'],
     docs: [['npm: Revoking access tokens', 'https://docs.npmjs.com/revoking-access-tokens'], ['PyPI help: API tokens', 'https://pypi.org/help/#apitoken'], ['RubyGems: API key scopes', 'https://guides.rubygems.org/api-key-scopes/'], ['Cargo: registry authentication', 'https://doc.rust-lang.org/cargo/reference/registry-authentication.html'], ['npm trusted publishing', 'https://docs.npmjs.com/trusted-publishers']],
   },
-  github: {
-    order: 2, label: 'GitHub tokens and sessions',
+  caches: {
+    order: 2, label: 'Caches, mirrors and artifact stores (they keep bad packages and old credentials alive)',
+    // Shown whenever a registry token or a known-bad package was found, even if the caches scanner found nothing itself.
+    alsoWhen: (f) => f.category === 'npm' || String(f.id ?? '').startsWith('supply.'),
     steps: [
-      'Make sure persistence is gone first (step above).',
+      'Local caches: `npm cache clean --force`; pnpm: delete the store at `pnpm store path` (`pnpm store prune` only removes unreferenced packages); Yarn: `yarn cache clean` (Berry: `yarn cache clean --all`); Bun: `bun pm cache rm`.',
+      'CI caches: `gh cache delete --all` for each repo on GitHub Actions (or the cache settings of your CI), then change the cache key so no old entry is restored. Cache the package manager store, not node_modules.',
+      'Private mirrors and proxies (Verdaccio, Artifactory, Nexus, GitHub Packages, CodeArtifact): rotate the mirror\'s own access tokens and the upstream credentials it uses to reach npmjs.org, and purge known-bad versions from its proxy cache so it stops serving them.',
+      'Images: rebuild every image with `docker build --pull --no-cache`, pass npm credentials with `RUN --mount=type=secret` instead of ARG, ENV or `COPY .npmrc`, and delete pushed images and build caches that were built with the old token.',
+    ],
+    verify: ['Revoke every token, clear the caches, then rebuild from scratch. If the build still installs private packages, something (a mirror, a cache, an image layer or a CI secret) still holds a working credential: find it before you call the rotation done.'],
+    docs: [['gh cache delete', 'https://cli.github.com/manual/gh_cache_delete'], ['npm cache', 'https://docs.npmjs.com/cli/v11/commands/npm-cache'], ['pnpm store', 'https://pnpm.io/cli/store'], ['Docker: build secrets', 'https://docs.docker.com/build/building/secrets/'], ['Verdaccio: uplinks', 'https://verdaccio.org/docs/uplinks'], ['GitHub Actions: dependency caching', 'https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching']],
+  },
+  github: {
+    order: 3, label: 'GitHub tokens and sessions',
+    steps: [
+      'Make sure persistence is gone first (step 1).',
       'Revoke PATs at github.com/settings/tokens and OAuth/GitHub App authorizations at /settings/applications; `gh auth logout` then `gh auth login` (stores the new token in the OS keyring).',
       'Replace classic `ghp_` tokens with fine-grained tokens that have an expiry and only the repos they need.',
       'Review your security log for `oauth_authorization` and token events, and repos for commits, branches or workflows you did not create.',
@@ -62,7 +76,7 @@ export const ROTATION = {
     docs: [['GitHub: token expiration and revocation', 'https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/token-expiration-and-revocation'], ['GitHub: managing personal access tokens', 'https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens']],
   },
   cloud: {
-    order: 3, label: 'Cloud and IaC credentials (AWS, GCP, Azure, Terraform, Pulumi)',
+    order: 4, label: 'Cloud and IaC credentials (AWS, GCP, Azure, Terraform, Pulumi)',
     steps: [
       'AWS: create a new access key, update users of it, deactivate the old key, confirm nothing breaks, then delete it. Better: `aws sso login` (short-lived).',
       'GCP: `gcloud auth application-default revoke`; delete exposed service-account keys in IAM.',
@@ -74,19 +88,19 @@ export const ROTATION = {
     docs: [['AWS: rotate access keys', 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#rotating_access_keys_console'], ['gcloud auth application-default revoke', 'https://cloud.google.com/sdk/gcloud/reference/auth/application-default/revoke']],
   },
   kubernetes: {
-    order: 4, label: 'Kubernetes and container registries',
+    order: 5, label: 'Kubernetes and container registries',
     steps: ['Rotate service-account tokens / client certs referenced by your kubeconfig.', '`docker logout <registry>`, revoke the registry token in its UI, then set "credsStore" so new logins go to the OS keychain.'],
     verify: ['`kubectl auth whoami` with the old credential fails.'],
     docs: [['Kubernetes: service accounts', 'https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/'], ['Docker: credential stores', 'https://docs.docker.com/reference/cli/docker/login/#credential-stores']],
   },
   paas: {
-    order: 5, label: 'Deploy platforms (Railway, Vercel, Fly, Render, Heroku, Netlify)', redeploy: true,
+    order: 6, label: 'Deploy platforms (Railway, Vercel, Fly, Render, Heroku, Netlify)', redeploy: true,
     steps: ['Rotate every secret stored in the platform\'s env store at its provider (DB, Stripe, AI keys), then update the variable.', 'Redeploy: services read env vars at start-up.', 'Log the CLI out and back in, and revoke old platform tokens.'],
     verify: ['The old DB password / API key is rejected by its provider; the redeployed service is healthy.'],
     docs: [['Railway security disclosure (Oct 21, 2026)', 'https://blog.railway.com/p/security-disclosure-wednesday-october-21st']],
   },
   frontend: {
-    order: 6, label: 'Secrets shipped to the browser (public env vars, built JS)', redeploy: true,
+    order: 7, label: 'Secrets shipped to the browser (public env vars, built JS)', redeploy: true,
     steps: [
       'Treat the key as public already: rotate it at the provider first. Every deployed build, preview deployment and CDN copy still contains the old value.',
       'Remove the public prefix (NEXT_PUBLIC_, VITE_, REACT_APP_, EXPO_PUBLIC_, ...) and use the secret only in server code: an API route, server action or edge function that the browser calls.',
@@ -97,37 +111,37 @@ export const ROTATION = {
     docs: [['Next.js: environment variables (NEXT_PUBLIC_)', 'https://nextjs.org/docs/app/guides/environment-variables'], ['Vite: env variables and modes', 'https://vite.dev/guide/env-and-mode'], ['Expo: environment variables', 'https://docs.expo.dev/guides/environment-variables/'], ['Create React App: custom environment variables', 'https://create-react-app.dev/docs/adding-custom-environment-variables/']],
   },
   env: {
-    order: 7, label: 'Secrets present in the environment / CI', redeploy: true,
+    order: 8, label: 'Secrets present in the environment / CI', redeploy: true,
     steps: ['Rotate each listed variable at its provider and update the CI secret store.', 'In CI, pass secrets only to the steps that need them, never to `npm install`.'],
     verify: ['Re-run this tool in CI: the variable no longer appears in the install step.'],
     docs: [['GitHub Actions: using secrets', 'https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions']],
   },
   ai: {
-    order: 8, label: 'AI provider keys and MCP servers',
+    order: 9, label: 'AI provider keys and MCP servers',
     steps: ['Revoke and reissue the keys in each provider console (OpenAI, Anthropic, etc.).', 'Replace literal values in MCP configs with "${ENV_VAR}" references; pin MCP server package versions instead of `npx -y <pkg>`.'],
     verify: ['A request with the old key returns 401.'],
     docs: [['Trail of Bits: insecure credential storage in MCP', 'https://blog.trailofbits.com/2025/04/30/insecure-credential-storage-plagues-mcp/']],
   },
   ssh: {
-    order: 9, label: 'SSH keys',
+    order: 10, label: 'SSH keys',
     steps: ['Generate a new key (`ssh-keygen -t ed25519`) with a passphrase.', 'Replace the public key on GitHub/GitLab and in every server\'s authorized_keys; remove the old one.'],
     verify: ['`ssh -i <old key> git@github.com` is denied.'],
     docs: [['GitHub: generating a new SSH key', 'https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent']],
   },
   dotenv: {
-    order: 10, label: 'Application secrets in .env files', redeploy: true,
+    order: 11, label: 'Application secrets in .env files', redeploy: true,
     steps: ['Rotate database passwords, payment keys and webhook secrets at each provider.', 'Redeploy: most platforms only read env vars at process start.'],
     verify: ['The old value is rejected by its provider.'],
     docs: [['The Twelve-Factor App: config', 'https://12factor.net/config']],
   },
   php: {
-    order: 11, label: 'Patch PHP (PHP2Shell)', redeploy: true,
+    order: 12, label: 'Patch PHP (PHP2Shell)', redeploy: true,
     steps: ['Update to 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 or later; PHP ≤ 8.1 must be upgraded.', 'Rebuild images with --pull --no-cache and restart all PHP workers.'],
     verify: ['`php -v` in each running container shows a fixed version.'],
     docs: [['CISA alert (Oct 21, 2026)', 'https://www.cisa.gov/news-events/alerts/2026/10/21/critical-vulnerabilities-php-require-immediate-patching']],
   },
   certs: {
-    order: 12, label: 'Replace certificates under emSign ECC Root CA - G3',
+    order: 13, label: 'Replace certificates under emSign ECC Root CA - G3',
     steps: ['Issue a replacement certificate from another CA before Oct 27, 2026.', 'Remove the root from custom trust bundles.'],
     verify: ['`openssl s_client -connect host:443` shows the new issuer.'],
     docs: [['Google: compromised eMudhra intermediates', 'https://blog.google/security/protecting-chrome-and-android-users-from-compromised-emudhra-intermediate-ca-certificates/']],
@@ -183,8 +197,10 @@ function finish(ctx, options, findings) {
 }
 
 export function runbook(result) {
-  const cats = [...new Set(result.findings.map((f) => f.category))].filter((c) => ROTATION[c]).sort((a, b) => ROTATION[a].order - ROTATION[b].order);
-  return cats.map((c) => ({ category: c, ...ROTATION[c], items: result.findings.filter((f) => f.category === c) }));
+  const present = new Set(result.findings.map((f) => f.category));
+  for (const [c, r] of Object.entries(ROTATION)) if (r.alsoWhen && result.findings.some(r.alsoWhen)) present.add(c);
+  const cats = [...present].filter((c) => ROTATION[c]).sort((a, b) => ROTATION[a].order - ROTATION[b].order);
+  return cats.map((c) => { const { alsoWhen, ...r } = ROTATION[c]; return { category: c, ...r, items: result.findings.filter((f) => f.category === c) }; });
 }
 
 export function failsAt(result, level) {
